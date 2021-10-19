@@ -4,10 +4,8 @@
 FROM node:alpine as frontend-builder
 
 WORKDIR /app
-
 COPY ./frontend .
 
-#RUN npm install -g yarn
 RUN yarn
 RUN yarn build
 
@@ -21,7 +19,6 @@ FROM golang:alpine as server-builder
 RUN apk update && apk add --no-cache git
 
 WORKDIR /app
-
 COPY ./server .
 
 RUN go get -d -v
