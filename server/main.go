@@ -2,15 +2,14 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"time"
 
+	"github.com/Stalis/go-react-app/api"
 	"github.com/Stalis/go-react-app/config"
 	"github.com/Stalis/go-react-app/middlewares"
 	"github.com/gorilla/mux"
@@ -37,9 +36,9 @@ func main() {
 	srv := &http.Server{
 		Addr: fmt.Sprintf("%s:%d", conf.HttpServer.Host, conf.HttpServer.Port),
 
-		WriteTimeout: time.Second * 15,
-		ReadTimeout:  time.Second * 15,
-		IdleTimeout:  time.Second * 60,
+		WriteTimeout: conf.HttpServer.WriteTimeout,
+		ReadTimeout:  conf.HttpServer.ReadTimeout,
+		IdleTimeout:  conf.HttpServer.IdleTimeout,
 		Handler:      r,
 	}
 
@@ -54,10 +53,10 @@ func main() {
 	go func() {
 		response, err := http.Get("https://google.com")
 		if err != nil {
-			log.Println(err)
+			log.Printf("Test HTTPS Request Failed: %v\n", err.Error())
 			return
 		}
-		log.Println(response.Status)
+		log.Printf("Test HTTPS Request passed!: %v\n", response.Status)
 	}()
 
 	c := make(chan os.Signal, 1)
@@ -81,25 +80,24 @@ func CreateRouter(conf config.Config) http.Handler {
 	router := mux.NewRouter()
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
-	RouteApi(apiRouter)
+	api.Route(apiRouter)
 
-	RouteFrontend(conf, router)
-
-	router.Use(middlewares.LoggingMiddleware)
+	RouteFrontend(conf.Frontend, router)
+	middlewares.Apply(router)
 
 	return router
 }
 
-func RouteFrontend(conf config.Config, router *mux.Router) {
-	files, err := ioutil.ReadDir(conf.Frontend.PathToDist)
+func RouteFrontend(conf config.FrontendConfig, router *mux.Router) {
+	files, err := ioutil.ReadDir(conf.PathToDist)
 	if err != nil {
 		log.Println(err)
 	}
 
-	fileServer := http.FileServer(http.Dir(conf.Frontend.PathToDist))
+	fileServer := http.FileServer(http.Dir(conf.PathToDist))
 
 	for _, v := range files {
-		if v.Name() == conf.Frontend.IndexPath {
+		if v.Name() == conf.IndexPath {
 			continue
 		}
 
@@ -113,33 +111,6 @@ func RouteFrontend(conf config.Config, router *mux.Router) {
 	}
 
 	router.NotFoundHandler = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		http.ServeFile(rw, r, conf.Frontend.PathToDist+"/"+conf.Frontend.IndexPath)
+		http.ServeFile(rw, r, conf.PathToDist+"/"+conf.IndexPath)
 	})
-}
-
-func RouteApi(r *mux.Router) {
-	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		// an example API handler
-		json.NewEncoder(w).Encode(map[string]bool{"ok": true})
-	})
-
-	r.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(map[string]bool{"ok": true})
-	})
-
-	r.HandleFunc("/hello", HelloApiHandler)
-}
-
-func HelloApiHandler(w http.ResponseWriter, r *http.Request) {
-	type HelloResponse struct {
-		Message string `json:"message"`
-	}
-
-	response := &HelloResponse{
-		Message: "Hello, World!",
-	}
-
-	formatted, _ := json.Marshal(response)
-	w.Header().Add("Content-Type", "application/json")
-	w.Write(formatted)
 }
