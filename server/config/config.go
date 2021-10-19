@@ -14,9 +14,13 @@ type FrontendConfig struct {
 }
 
 type HttpServerConfig struct {
-	Host         string        `env:"SERVER_HOST" envDefault:""`
-	Port         int           `env:"PORT" envDefault:"80"`
-	ShutdownWait time.Duration `env:"SHUTDOWN_WAIT" envDefault:"15s"`
+	Host string `env:"SERVER_HOST" envDefault:""`
+	Port int    `env:"SERVER_PORT" envDefault:"80"`
+
+	WriteTimeout time.Duration `env:"SERVER_WRITE_TIMEOUT" envDefault:"15s"`
+	ReadTimeout  time.Duration `env:"SERVER_READ_TIMEOUT" envDefault:"15s"`
+	IdleTimeout  time.Duration `env:"SERVER_IDLE_TIMEOUT" envDefault:"60s"`
+	ShutdownWait time.Duration `env:"SERVER_SHUTDOWN_WAIT" envDefault:"15s"`
 }
 
 type Config struct {
