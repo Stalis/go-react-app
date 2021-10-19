@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -75,18 +76,26 @@ func CreateRouter(conf config.Config) http.Handler {
 }
 
 func RouteFrontend(conf config.Config, router *mux.Router) {
-	fileServer := http.FileServer(http.Dir(conf.Frontend.PathToDist))
-	router.PathPrefix("/asset-manifest.json").Handler(http.StripPrefix("/", fileServer))
-	router.PathPrefix("/favicon.ico").Handler(http.StripPrefix("/", fileServer))
-	router.PathPrefix("/logo192.png").Handler(http.StripPrefix("/", fileServer))
-	router.PathPrefix("/logo512.png").Handler(http.StripPrefix("/", fileServer))
-	router.PathPrefix("/manifest.json").Handler(http.StripPrefix("/", fileServer))
-	router.PathPrefix("/robots.txt").Handler(http.StripPrefix("/", fileServer))
+	files, err := ioutil.ReadDir(conf.Frontend.PathToDist)
+	if err != nil {
+		log.Println(err)
+	}
 
-	staticRouter := router.PathPrefix("/static").Subrouter()
-	staticRouter.PathPrefix("/js").Handler(http.StripPrefix("/", fileServer))
-	staticRouter.PathPrefix("/css").Handler(http.StripPrefix("/", fileServer))
-	staticRouter.PathPrefix("/media").Handler(http.StripPrefix("/", fileServer))
+	fileServer := http.FileServer(http.Dir(conf.Frontend.PathToDist))
+
+	for _, v := range files {
+		if v.Name() == conf.Frontend.IndexPath {
+			continue
+		}
+
+		prefix := "/" + v.Name()
+		if v.IsDir() {
+			prefix += "/"
+		}
+
+		log.Printf("Static route for %s\n", prefix)
+		router.PathPrefix(prefix).Handler(http.StripPrefix("/", fileServer))
+	}
 
 	router.NotFoundHandler = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		http.ServeFile(rw, r, conf.Frontend.PathToDist+"/"+conf.Frontend.IndexPath)
