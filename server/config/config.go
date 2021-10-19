@@ -1,21 +1,22 @@
 package config
 
 import (
+	"fmt"
 	"log"
-	"os"
-	"strconv"
 	"time"
+
+	"github.com/caarlos0/env/v6"
 )
 
 type FrontendConfig struct {
-	PathToDist string
-	IndexPath  string
+	PathToDist string `env:"FRINTEND_PATH"`
+	IndexPath  string `env:"FRONTEND_INDEX" envDefault:"index.html"`
 }
 
 type HttpServerConfig struct {
-	Host         string
-	Port         int
-	ShutdownWait time.Duration
+	Host         string        `env:"SERVER_HOST" envDefault:""`
+	Port         int           `env:"PORT" envDefault:"9080"`
+	ShutdownWait time.Duration `env:"SHUTDOWN_WAIT" envDefault:"15s"`
 }
 
 type Config struct {
@@ -24,52 +25,11 @@ type Config struct {
 }
 
 func New() *Config {
-	return &Config{
-		HttpServer: HttpServerConfig{
-			Host:         getEnvAsString("SERVER_HOST", ""),
-			Port:         getEnvAsInt("SERVER_PORT", 80),
-			ShutdownWait: getEnvAsDuration("SHUTDOWN_WAIT", time.Second*15),
-		},
-		Frontend: FrontendConfig{
-			PathToDist: getEnvAsString("FRONTEND_PATH", "frontend/build"),
-			IndexPath:  getEnvAsString("FRONTEND_INDEX", "index.html"),
-		},
+	cfg := &Config{}
+	if err := env.Parse(cfg); err != nil {
+		log.Printf("%+v\n", err)
 	}
-}
 
-func getEnvAsString(key string, defaultVal string) string {
-	if value, exists := os.LookupEnv(key); exists {
-		return value
-	}
-	return defaultVal
-}
-
-func getEnvAsBool(key string, defaultVal bool) bool {
-	if valueStr := getEnvAsString(key, ""); valueStr != "" {
-		if res, err := strconv.ParseBool(valueStr); err == nil {
-			return res
-		}
-		log.Printf("Error to parse environment variable: %s\n", key)
-	}
-	return defaultVal
-}
-
-func getEnvAsInt(key string, defaultVal int) int {
-	if valueStr := getEnvAsString(key, ""); valueStr != "" {
-		if res, err := strconv.Atoi(valueStr); err == nil {
-			return res
-		}
-		log.Printf("Error to parse environment variable: %s\n", key)
-	}
-	return defaultVal
-}
-
-func getEnvAsDuration(key string, defaultVal time.Duration) time.Duration {
-	if valueStr := getEnvAsString(key, ""); valueStr != "" {
-		if res, err := time.ParseDuration(valueStr); err == nil {
-			return res
-		}
-		log.Printf("Error to parse environment variable: %s\n", key)
-	}
-	return defaultVal
+	fmt.Printf("%+v\n", *cfg)
+	return cfg
 }
