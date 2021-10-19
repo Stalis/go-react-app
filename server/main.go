@@ -26,6 +26,12 @@ func init() {
 func main() {
 	conf := config.New()
 
+	if conf.IsDebug {
+		fmt.Println("================================================================")
+		fmt.Println("=            DEBUG MODE!!! DON'T USE FOR PRODUCTION            =")
+		fmt.Println("================================================================")
+	}
+
 	r := CreateRouter(*conf)
 
 	srv := &http.Server{
@@ -39,10 +45,19 @@ func main() {
 
 	// запускаем сервер в горутине, чтобы не блокировать его
 	go func() {
-		fmt.Printf("Server started at: http://%s\n", srv.Addr)
+		log.Printf("Server started at: http://%s\n", srv.Addr)
 		if err := srv.ListenAndServe(); err != nil {
 			log.Println(err)
 		}
+	}()
+
+	go func() {
+		response, err := http.Get("https://google.com")
+		if err != nil {
+			log.Println(err)
+			return
+		}
+		log.Println(response.Status)
 	}()
 
 	c := make(chan os.Signal, 1)

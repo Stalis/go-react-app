@@ -9,17 +9,18 @@ import (
 )
 
 type FrontendConfig struct {
-	PathToDist string `env:"FRINTEND_PATH"`
+	PathToDist string `env:"FRONTEND_PATH"`
 	IndexPath  string `env:"FRONTEND_INDEX" envDefault:"index.html"`
 }
 
 type HttpServerConfig struct {
 	Host         string        `env:"SERVER_HOST" envDefault:""`
-	Port         int           `env:"PORT" envDefault:"9080"`
+	Port         int           `env:"PORT" envDefault:"80"`
 	ShutdownWait time.Duration `env:"SHUTDOWN_WAIT" envDefault:"15s"`
 }
 
 type Config struct {
+	IsDebug    bool `env:"DEBUG" envDefault:"false"`
 	HttpServer HttpServerConfig
 	Frontend   FrontendConfig
 }
