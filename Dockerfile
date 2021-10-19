@@ -1,19 +1,19 @@
 FROM golang:latest
 
-WORKDIR /app
+WORKDIR /app/frontend
+COPY ./frontend/build .
 
-COPY ./frontend/build ./frontend
-COPY ./server ./src
-
-RUN cd src
+WORKDIR /app/src
+COPY ./server .
 RUN go build -o ../server
 
-RUN cd ..
+WORKDIR /app
 
-ENV SERVER_HOST=localhost
 ENV SERVER_PORT=80
-ENV FRONTEND_PATH=frontend
+ENV FRONTEND_PATH=/app/frontend
 ENV FRONTEND_INDEX=index.html
+
+EXPOSE 80
 
 CMD [ "/app/server" ]
 
