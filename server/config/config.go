@@ -1,7 +1,7 @@
 package config
 
 import (
-	"fmt"
+	"log"
 	"os"
 	"strconv"
 	"time"
@@ -9,6 +9,7 @@ import (
 
 type FrontendConfig struct {
 	PathToDist string
+	IndexPath  string
 }
 
 type HttpServerConfig struct {
@@ -31,6 +32,7 @@ func New() *Config {
 		},
 		Frontend: FrontendConfig{
 			PathToDist: getEnvAsString("FRONTEND_PATH", "frontend/build"),
+			IndexPath:  getEnvAsString("FRONTEND_INDEX", "index.html"),
 		},
 	}
 }
@@ -47,7 +49,7 @@ func getEnvAsBool(key string, defaultVal bool) bool {
 		if res, err := strconv.ParseBool(valueStr); err == nil {
 			return res
 		}
-		fmt.Printf("Error to parse environment variable: %s\n", key)
+		log.Printf("Error to parse environment variable: %s\n", key)
 	}
 	return defaultVal
 }
@@ -57,7 +59,7 @@ func getEnvAsInt(key string, defaultVal int) int {
 		if res, err := strconv.Atoi(valueStr); err == nil {
 			return res
 		}
-		fmt.Printf("Error to parse environment variable: %s\n", key)
+		log.Printf("Error to parse environment variable: %s\n", key)
 	}
 	return defaultVal
 }
@@ -67,7 +69,7 @@ func getEnvAsDuration(key string, defaultVal time.Duration) time.Duration {
 		if res, err := time.ParseDuration(valueStr); err == nil {
 			return res
 		}
-		fmt.Printf("Error to parse environment variable: %s\n", key)
+		log.Printf("Error to parse environment variable: %s\n", key)
 	}
 	return defaultVal
 }

@@ -1,4 +1,4 @@
-module github.com/Stalis/go-react-spa
+module github.com/Stalis/go-react-app
 
 go 1.17
 
