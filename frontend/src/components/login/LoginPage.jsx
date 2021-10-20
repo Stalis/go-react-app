@@ -20,10 +20,9 @@ export class LoginPage extends React.Component {
         }).then(response => console.log(response.data));
     };
 
-    handleInputChange = (event) => {
+    inputChangeHandler = (name) => (event) => {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
-        const name = target.name;
 
         this.setState({
             [name]: value,
@@ -38,7 +37,7 @@ export class LoginPage extends React.Component {
                     <Form.Control type="text" placeholder="Enter username" 
                         name="username"
                         value={this.state.username}
-                        onChange={this.handleInputChange} />
+                        onChange={this.inputChangeHandler('username')} />
                     <Form.Text className="text-muted">
                         We'll never share your username with anyone else.
                     </Form.Text>
@@ -49,7 +48,7 @@ export class LoginPage extends React.Component {
                     <Form.Control type="password" placeholder="Password"
                         name="password"
                         value={this.state.password}
-                        onChange={this.handleInputChange} />
+                        onChange={this.inputChangeHandler('password')} />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="formBasicCheckbox">
                     <Form.Check type="checkbox" label="Check me out" />
