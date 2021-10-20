@@ -23,10 +23,15 @@ type HttpServerConfig struct {
 	ShutdownWait time.Duration `env:"SERVER_SHUTDOWN_WAIT" envDefault:"15s"`
 }
 
+type DatabaseConfig struct {
+	Url string `env:"DATABASE_URL,required"`
+}
+
 type Config struct {
 	IsDebug    bool `env:"DEBUG" envDefault:"false"`
 	HttpServer HttpServerConfig
 	Frontend   FrontendConfig
+	Database   DatabaseConfig
 }
 
 func New() *Config {
