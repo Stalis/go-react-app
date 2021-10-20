@@ -1,4 +1,4 @@
-import logo from './logo.svg';
+import logo from '../assets/logo.svg';
 import './App.scss';
 import { LoginPage } from './login/LoginPage';
 import { Routes, Route } from 'react-router';
