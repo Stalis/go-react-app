@@ -31,7 +31,7 @@ func main() {
 		fmt.Println("================================================================")
 	}
 
-	r := CreateRouter(*conf)
+	r := CreateRouter(conf)
 
 	srv := &http.Server{
 		Addr: fmt.Sprintf("%s:%d", conf.HttpServer.Host, conf.HttpServer.Port),
@@ -76,11 +76,11 @@ func main() {
 	os.Exit(0)
 }
 
-func CreateRouter(conf config.Config) http.Handler {
+func CreateRouter(conf *config.Config) http.Handler {
 	router := mux.NewRouter()
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
-	api.Route(apiRouter)
+	api.Route(apiRouter, conf)
 
 	RouteFrontend(conf.Frontend, router)
 	middlewares.Apply(router)

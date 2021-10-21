@@ -1,4 +1,4 @@
-package api
+package handlers
 
 import (
 	"crypto/md5"
@@ -15,15 +15,18 @@ type RegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	Success bool `json:"success"`
+	IsSuccess bool `json:"success"`
 }
 
-func hashPassword(input string) string {
-	data := []byte(input)
-	return fmt.Sprintf("%x", md5.Sum(data))
+type Register struct {
+	db *dal.DB
 }
 
-func RegisterHandler(rw http.ResponseWriter, r *http.Request) {
+func NewRegister(db *dal.DB) *Register {
+	return &Register{db}
+}
+
+func (h *Register) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	var request RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
@@ -35,21 +38,19 @@ func RegisterHandler(rw http.ResponseWriter, r *http.Request) {
 		PasswordHash: hashPassword(request.Password),
 	}
 
-	db, err := dal.ConnectDB()
-	if err != nil {
-		http.Error(rw, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	defer db.Close()
-
-	_, err = db.CreateUser(&entity)
+	_, err := h.db.CreateUser(&entity)
 	if err != nil {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	payload, _ := json.Marshal(RegisterResponse{Success: true})
+	payload, _ := json.Marshal(RegisterResponse{IsSuccess: true})
 
 	rw.Header().Set("Content-Type", "application/json")
 	rw.Write(payload)
+}
+
+func hashPassword(input string) string {
+	data := []byte(input)
+	return fmt.Sprintf("%x", md5.Sum(data))
 }

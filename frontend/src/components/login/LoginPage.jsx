@@ -13,7 +13,12 @@ export function LoginPage() {
             username,
             password,
         }).then(({ data }) => {
-            console.log(data)
+            console.log(data);
+            if (data.isSuccess) {
+                alert('Login successful!');
+            } else {
+                alert('Login error!');
+            }
         });
     };
 

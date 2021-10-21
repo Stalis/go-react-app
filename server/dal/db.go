@@ -3,6 +3,7 @@ package dal
 import (
 	"context"
 
+	"github.com/gofrs/uuid"
 	"github.com/jackc/pgtype"
 	pgtypeuuid "github.com/jackc/pgtype/ext/gofrs-uuid"
 	"github.com/jackc/pgx/v4"
@@ -13,9 +14,8 @@ type DB struct {
 	pool *pgxpool.Pool
 }
 
-func ConnectDB() (*DB, error) {
-	databaseUrl := "postgresql://api:123@localhost:9423/TestDB"
-	dbconfig, err := pgxpool.ParseConfig(databaseUrl)
+func ConnectDB(connectionUri string) (*DB, error) {
+	dbconfig, err := pgxpool.ParseConfig(connectionUri)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func (db *DB) CreateUser(user *User) (int64, error) {
 	defer conn.Release()
 
 	row := conn.QueryRow(context.Background(),
-		`INSERT INTO users(username, passwordHash) VALUES ($1, $2) RETURNING id`,
+		`INSERT INTO users(username, password_hash) VALUES ($1, $2) RETURNING id`,
 		user.Username, user.PasswordHash)
 
 	var userId int64
@@ -96,4 +96,23 @@ func (db *DB) GetUserByUsername(username string) (*User, error) {
 	}
 
 	return &res, nil
+}
+
+func (db *DB) CreateSession(userId int64) (uuid.UUID, error) {
+	conn, err := db.pool.Acquire(context.Background())
+	if err != nil {
+		return uuid.Nil, err
+	}
+	defer conn.Release()
+
+	row := conn.QueryRow(context.Background(),
+		`INSERT INTO sessions(user_id) VALUES ($1) RETURNING token`,
+		userId)
+
+	var sessionToken uuid.UUID
+	if err = row.Scan(&sessionToken); err != nil {
+		return uuid.Nil, err
+	}
+
+	return sessionToken, nil
 }

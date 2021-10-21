@@ -17,7 +17,7 @@ export function RegisterPage() {
             password,
         }).then(({ data }) => {
             console.log(data);
-            if (data.success) {
+            if (data.isSuccess) {
                 alert('Register successful!')
             } else {
                 alert('Not registered!');
