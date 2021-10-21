@@ -78,7 +78,7 @@ func main() {
 
 func CreateRouter(conf *config.Config) http.Handler {
 	router := mux.NewRouter()
-
+	router.StrictSlash(true)
 	apiRouter := router.PathPrefix("/api").Subrouter()
 	api.Route(apiRouter, conf)
 

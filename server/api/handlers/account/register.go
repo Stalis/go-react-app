@@ -1,4 +1,4 @@
-package handlers
+package account
 
 import (
 	"crypto/md5"
@@ -15,18 +15,18 @@ type RegisterRequest struct {
 }
 
 type RegisterResponse struct {
-	IsSuccess bool `json:"success"`
+	Success bool `json:"success"`
 }
 
-type Register struct {
+type register struct {
 	db *dal.DB
 }
 
-func NewRegister(db *dal.DB) *Register {
-	return &Register{db}
+func NewRegister(db *dal.DB) http.Handler {
+	return &register{db}
 }
 
-func (h *Register) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (h *register) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	var request RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
@@ -44,7 +44,7 @@ func (h *Register) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	payload, _ := json.Marshal(RegisterResponse{IsSuccess: true})
+	payload, _ := json.Marshal(RegisterResponse{Success: true})
 
 	rw.Header().Set("Content-Type", "application/json")
 	rw.Write(payload)

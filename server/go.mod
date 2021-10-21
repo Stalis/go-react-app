@@ -23,4 +23,7 @@ require (
 	golang.org/x/text v0.3.7 // indirect
 )
 
-require github.com/google/uuid v1.3.0
+require (
+	github.com/rubenv/sql-migrate v0.0.0-20210614095031-55d5740dbbcc // direct
+	gopkg.in/gorp.v1 v1.7.2 // indirect
+)

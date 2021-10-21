@@ -1,4 +1,4 @@
-package handlers
+package account
 
 import (
 	"encoding/json"
@@ -14,19 +14,19 @@ type LoginRequest struct {
 }
 
 type LoginResponse struct {
-	IsSuccess    bool      `json:"isSuccess"`
+	Success      bool      `json:"success"`
 	SessionToken uuid.UUID `json:"sessionToken"`
 }
 
-type Login struct {
+type login struct {
 	db *dal.DB
 }
 
-func NewLogin(db *dal.DB) *Login {
-	return &Login{db}
+func NewLogin(db *dal.DB) http.Handler {
+	return &login{db}
 }
 
-func (h *Login) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+func (h *login) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	var request LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
 		http.Error(rw, err.Error(), http.StatusBadRequest)
@@ -38,7 +38,7 @@ func (h *Login) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 	}
 
-	response := LoginResponse{IsSuccess: false, SessionToken: uuid.Nil}
+	response := LoginResponse{Success: false, SessionToken: uuid.Nil}
 
 	hash := hashPassword(request.Password)
 	if user.PasswordHash == hash {
@@ -47,7 +47,7 @@ func (h *Login) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 		}
 
-		response.IsSuccess = true
+		response.Success = true
 		response.SessionToken = token
 	}
 

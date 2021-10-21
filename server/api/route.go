@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Stalis/go-react-app/api/handlers"
+	"github.com/Stalis/go-react-app/api/handlers/account"
 	"github.com/Stalis/go-react-app/config"
 	"github.com/Stalis/go-react-app/dal"
 	"github.com/gorilla/mux"
@@ -20,12 +20,13 @@ func Route(r *mux.Router, cfg *config.Config) {
 
 	db, err := dal.ConnectDB(cfg.Database.Url)
 	if err != nil {
-		log.Println(err)
-		os.Exit(1)
+		log.Println(err.Error())
+		os.Exit(-1)
 	}
 
-	r.Handle("/login", handlers.NewLogin(db))
-	r.Handle("/register", handlers.NewRegister(db))
+	accountRouter := r.PathPrefix("/account").Subrouter()
+	accountRouter.Handle("/login", account.NewLogin(db))
+	accountRouter.Handle("/register", account.NewRegister(db))
 
 	r.HandleFunc("/hello", HelloApiHandler)
 }

@@ -24,9 +24,9 @@ RUN apk add ca-certificates tzdata
 WORKDIR /app
 COPY ./server .
 
-# Disable cgo for standalone binary
 RUN go get -d -v
 RUN go build -o /app/bin/server
+RUN cp -r /app/migrations /app/bin/migrations
 
 ############################
 # STEP 3 build a small image

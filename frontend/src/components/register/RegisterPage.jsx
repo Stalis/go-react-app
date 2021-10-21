@@ -8,23 +8,33 @@ export function RegisterPage() {
     const [password, setPassword] = useState('')
     const [repeatPassword, setRepeatPassword] = useState('')
 
-    const handleSubmit = (ev) => {
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+
         if (password !== repeatPassword) {
             alert('Repeat password incorrect!');
+            return;
         }
-        axios.post('/api/register', {
-            username,
-            password,
-        }).then(({ data }) => {
-            console.log(data);
-            if (data.isSuccess) {
-                alert('Register successful!')
-            } else {
-                alert('Not registered!');
-            }
-        })
-        ev.preventDefault();
-    }
+
+        let enc = new TextEncoder();
+        let hash = await crypto.subtle.digest('SHA-256', enc.encode(password));
+        
+        const packed = window.btoa(
+            String.fromCharCode.apply(null, new Uint8Array(hash))
+        )
+
+        let { data } = await axios.post('/api/account/register', {
+                username,
+                password: packed,
+            });
+
+        console.log(data);
+        if (data.success) {
+            alert('Register successful!')
+        } else {
+            alert('Not registered!');
+        }
+    };
 
     return (
         <>

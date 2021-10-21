@@ -7,19 +7,27 @@ export function LoginPage() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault();
-        axios.post('/api/login', {
-            username,
-            password,
-        }).then(({ data }) => {
-            console.log(data);
-            if (data.isSuccess) {
-                alert('Login successful!');
-            } else {
-                alert('Login error!');
-            }
-        });
+
+        const enc = new TextEncoder();
+        const hash = await crypto.subtle.digest('SHA-256', enc.encode(password))
+
+        const packed = window.btoa(
+            String.fromCharCode.apply(null, new Uint8Array(hash))
+        )
+
+        const { data } = await axios.post('/api/account/login', {
+                username,
+                password: packed,
+            });
+
+        console.log(data);
+        if (data.success) {
+            alert('Login successful!');
+        } else {
+            alert('Login error!');
+        }
     };
 
     return (
@@ -46,11 +54,13 @@ export function LoginPage() {
                     value={password}
                     onChange={e => setPassword(e.currentTarget.value)} />
             </Form.Group>
+
             <Form.Group className="mb-3" controlId="formBasicCheckbox">
                 <Form.Check 
                     type="checkbox" 
                     label="Check me out" />
             </Form.Group>
+            
             <Button variant="primary" type="submit">
                 Log In
             </Button>
