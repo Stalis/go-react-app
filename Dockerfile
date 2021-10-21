@@ -29,6 +29,7 @@ ENV CGO_ENABLED=0
 ENV GOOS=linux
 RUN go get -d -v
 RUN go build -o /app/bin/server
+RUN cp -r /app/migrations /app/bin/migrations
 
 ############################
 # STEP 3 build a small image
