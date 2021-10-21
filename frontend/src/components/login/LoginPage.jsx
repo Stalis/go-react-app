@@ -10,8 +10,8 @@ export function LoginPage() {
     const handleSubmit = (event) => {
         event.preventDefault();
         axios.post('/api/login', {
-            username: this.state.username,
-            password: this.state.password,
+            username,
+            password,
         }).then(({ data }) => {
             console.log(data)
         });

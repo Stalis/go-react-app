@@ -81,5 +81,19 @@ func (db *DB) GetUserById(id int64) (*User, error) {
 }
 
 func (db *DB) GetUserByUsername(username string) (*User, error) {
+	conn, err := db.pool.Acquire(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	defer conn.Release()
 
+	row := conn.QueryRow(context.Background(),
+		`SELECT id, username, password_hash FROM users WHERE username = $1`,
+		username)
+	var res User
+	if err = row.Scan(&res.Id, &res.Username, &res.PasswordHash); err != nil {
+		return nil, err
+	}
+
+	return &res, nil
 }
