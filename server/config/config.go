@@ -8,6 +8,11 @@ import (
 	"github.com/caarlos0/env/v6"
 )
 
+type CommonConfig struct {
+	IsDebug      bool   `env:"DEBUG" envDefault:"false"`
+	LoggerPrefix string `env:"LOGGER_PREFIX" envDefault:"[go-react-app]"`
+}
+
 type FrontendConfig struct {
 	PathToDist string `env:"FRONTEND_PATH"`
 	IndexPath  string `env:"FRONTEND_INDEX" envDefault:"index.html"`
@@ -28,7 +33,7 @@ type DatabaseConfig struct {
 }
 
 type Config struct {
-	IsDebug    bool `env:"DEBUG" envDefault:"false"`
+	Common     CommonConfig
 	HttpServer HttpServerConfig
 	Frontend   FrontendConfig
 	Database   DatabaseConfig

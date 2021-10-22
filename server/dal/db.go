@@ -14,7 +14,7 @@ type DB struct {
 	pool *pgxpool.Pool
 }
 
-func ConnectDB(connectionUri string) (*DB, error) {
+func ConnectDB(connectionUri string, l *log.Logger) (*DB, error) {
 	dbconfig, err := pgxpool.ParseConfig(connectionUri)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func ConnectDB(connectionUri string) (*DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	log.Printf("%d migration applied", migrationsNum)
+	l.Printf("%d migration applied", migrationsNum)
 
 	return &DB{pool}, nil
 }

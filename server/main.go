@@ -3,16 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
 
-	"github.com/Stalis/go-react-app/api"
 	"github.com/Stalis/go-react-app/config"
-	"github.com/Stalis/go-react-app/middlewares"
-	"github.com/gorilla/mux"
+	"github.com/Stalis/go-react-app/router"
 	"github.com/joho/godotenv"
 )
 
@@ -25,13 +22,15 @@ func init() {
 func main() {
 	conf := config.New()
 
-	if conf.IsDebug {
+	if conf.Common.IsDebug {
 		fmt.Println("================================================================")
 		fmt.Println("=            DEBUG MODE!!! DON'T USE FOR PRODUCTION            =")
 		fmt.Println("================================================================")
 	}
 
-	r := CreateRouter(conf)
+	l := log.New(os.Stdout, conf.Common.LoggerPrefix+" ", log.LstdFlags)
+
+	r := router.CreateNew(conf, l)
 
 	srv := &http.Server{
 		Addr: fmt.Sprintf("%s:%d", conf.HttpServer.Host, conf.HttpServer.Port),
@@ -44,27 +43,28 @@ func main() {
 
 	// запускаем сервер в горутине, чтобы не блокировать его
 	go func() {
-		log.Printf("Server started at: http://%s\n", srv.Addr)
+		l.Printf("Server started at: http://%s\n", srv.Addr)
 		if err := srv.ListenAndServe(); err != nil {
-			log.Println(err)
+			l.Println(err)
 		}
 	}()
 
 	go func() {
 		response, err := http.Get("https://google.com")
 		if err != nil {
-			log.Printf("Test HTTPS Request Failed: %v\n", err.Error())
+			l.Printf("Test HTTPS Request Failed: %v\n", err.Error())
 			return
 		}
-		log.Printf("Test HTTPS Request passed!: %v\n", response.Status)
+		l.Printf("Test HTTPS Request passed!: %v\n", response.Status)
 	}()
 
-	c := make(chan os.Signal, 1)
+	sigChan := make(chan os.Signal, 1)
 	// будем ждать любой сигнал на прерывание процесса
-	signal.Notify(c, os.Interrupt)
+	signal.Notify(sigChan, os.Interrupt)
 
 	// блокируем поток, пока не придет нужный сигнал
-	<-c
+	sig := <-sigChan
+	l.Printf("Interrupted with signal: %v", sig)
 
 	// завершаем все рабочие процессы контекста
 	ctx, cancel := context.WithTimeout(context.Background(), conf.HttpServer.ShutdownWait)
@@ -72,45 +72,6 @@ func main() {
 
 	srv.Shutdown(ctx)
 
-	log.Println("shutting down")
+	l.Println("shutting down")
 	os.Exit(0)
-}
-
-func CreateRouter(conf *config.Config) http.Handler {
-	router := mux.NewRouter()
-	router.StrictSlash(true)
-	apiRouter := router.PathPrefix("/api").Subrouter()
-	api.Route(apiRouter, conf)
-
-	RouteFrontend(conf.Frontend, router)
-	middlewares.Apply(router)
-
-	return router
-}
-
-func RouteFrontend(conf config.FrontendConfig, router *mux.Router) {
-	files, err := ioutil.ReadDir(conf.PathToDist)
-	if err != nil {
-		log.Println(err)
-	}
-
-	fileServer := http.FileServer(http.Dir(conf.PathToDist))
-
-	for _, v := range files {
-		if v.Name() == conf.IndexPath {
-			continue
-		}
-
-		prefix := "/" + v.Name()
-		if v.IsDir() {
-			prefix += "/"
-		}
-
-		log.Printf("Static route for %s\n", prefix)
-		router.PathPrefix(prefix).Handler(http.StripPrefix("/", fileServer))
-	}
-
-	router.NotFoundHandler = http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		http.ServeFile(rw, r, conf.PathToDist+"/"+conf.IndexPath)
-	})
 }

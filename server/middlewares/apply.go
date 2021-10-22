@@ -1,7 +1,13 @@
 package middlewares
 
-import "github.com/gorilla/mux"
+import (
+	"log"
 
-func Apply(router *mux.Router) {
-	router.Use(LoggingMiddleware)
+	"github.com/gorilla/mux"
+)
+
+func Apply(router *mux.Router, l *log.Logger) {
+
+	logging := &loggingMiddleware{l}
+	router.Use(logging.Middleware)
 }
