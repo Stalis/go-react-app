@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/Stalis/go-react-app/dal"
+	"github.com/Stalis/go-react-app/server/dal"
 )
 
 type RegisterRequest struct {

@@ -7,7 +7,9 @@ import (
 )
 
 func Apply(router *mux.Router, l *log.Logger) {
+	recovery := &recovery{l}
+	router.Use(recovery.Middleware)
 
-	logging := &loggingMiddleware{l}
+	logging := &logger{l}
 	router.Use(logging.Middleware)
 }

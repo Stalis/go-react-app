@@ -7,10 +7,10 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Stalis/go-react-app/config"
-	"github.com/Stalis/go-react-app/dal"
-	"github.com/Stalis/go-react-app/handlers/account"
-	"github.com/Stalis/go-react-app/middlewares"
+	"github.com/Stalis/go-react-app/server/config"
+	"github.com/Stalis/go-react-app/server/dal"
+	"github.com/Stalis/go-react-app/server/handlers/account"
+	"github.com/Stalis/go-react-app/server/middlewares"
 	"github.com/gorilla/mux"
 )
 

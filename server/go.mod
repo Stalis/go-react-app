@@ -1,4 +1,4 @@
-module github.com/Stalis/go-react-app
+module github.com/Stalis/go-react-app/server
 
 go 1.17
 

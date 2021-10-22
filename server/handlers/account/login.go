@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Stalis/go-react-app/dal"
+	"github.com/Stalis/go-react-app/server/dal"
 	"github.com/gofrs/uuid"
 )
 

@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Stalis/go-react-app/dal"
+	"github.com/Stalis/go-react-app/server/dal"
 	"github.com/gofrs/uuid"
 )
 

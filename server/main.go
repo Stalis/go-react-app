@@ -8,8 +8,8 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/Stalis/go-react-app/config"
-	"github.com/Stalis/go-react-app/router"
+	"github.com/Stalis/go-react-app/server/config"
+	"github.com/Stalis/go-react-app/server/router"
 	"github.com/joho/godotenv"
 )
 
