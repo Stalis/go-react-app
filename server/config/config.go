@@ -2,15 +2,20 @@ package config
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/caarlos0/env/v6"
+	"github.com/joho/godotenv"
 )
 
 type CommonConfig struct {
-	IsDebug      bool   `env:"DEBUG" envDefault:"false"`
-	LoggerPrefix string `env:"LOGGER_PREFIX" envDefault:"[go-react-app]"`
+	IsDebug bool `env:"DEBUG" envDefault:"false"`
+}
+
+type LogConfig struct {
+	Level       string `env:"LOG_LEVEL" envDefault:"warn"`
+	MaxFileSize int    `env:"LOG_FILESIZE" envDefault:"1073741824"`
+	MaxBackups  int    `env:"LOG_BACKUPS" envDefault:"5"`
 }
 
 type FrontendConfig struct {
@@ -34,15 +39,22 @@ type DatabaseConfig struct {
 
 type Config struct {
 	Common     CommonConfig
+	Log        LogConfig
 	HttpServer HttpServerConfig
 	Frontend   FrontendConfig
 	Database   DatabaseConfig
 }
 
+func init() {
+	if err := godotenv.Load(".env"); err != nil {
+		fmt.Println("No .env file found!")
+	}
+}
+
 func New() *Config {
 	cfg := &Config{}
 	if err := env.Parse(cfg); err != nil {
-		log.Printf("%+v\n", err)
+		fmt.Printf("%+v\n", err)
 	}
 
 	fmt.Printf("%+v\n", *cfg)

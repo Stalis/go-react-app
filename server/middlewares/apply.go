@@ -1,15 +1,14 @@
 package middlewares
 
 import (
-	"log"
-
 	"github.com/gorilla/mux"
 )
 
-func Apply(router *mux.Router, l *log.Logger) {
-	recovery := &recovery{l}
+func Apply(router *mux.Router) {
+
+	recovery := &recovery{}
 	router.Use(recovery.Middleware)
 
-	logging := &logger{l}
+	logging := &logger{}
 	router.Use(logging.Middleware)
 }

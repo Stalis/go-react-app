@@ -1,17 +1,15 @@
 package account
 
 import (
-	"crypto/md5"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/Stalis/go-react-app/server/dal"
 )
 
 type RegisterRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
+	Username     string `json:"username"`
+	PasswordHash string `json:"password"`
 }
 
 type RegisterResponse struct {
@@ -35,7 +33,7 @@ func (h *register) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	entity := dal.User{
 		Username:     request.Username,
-		PasswordHash: hashPassword(request.Password),
+		PasswordHash: request.PasswordHash,
 	}
 
 	_, err := h.db.CreateUser(&entity)
@@ -48,9 +46,4 @@ func (h *register) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	rw.Header().Set("Content-Type", "application/json")
 	rw.Write(payload)
-}
-
-func hashPassword(input string) string {
-	data := []byte(input)
-	return fmt.Sprintf("%x", md5.Sum(data))
 }

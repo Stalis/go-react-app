@@ -27,3 +27,5 @@ require (
 	github.com/rubenv/sql-migrate v0.0.0-20210614095031-55d5740dbbcc // direct
 	gopkg.in/gorp.v1 v1.7.2 // indirect
 )
+
+require github.com/phuslu/log v1.0.75 // indirect

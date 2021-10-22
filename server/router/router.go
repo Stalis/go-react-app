@@ -3,7 +3,6 @@ package router
 import (
 	"encoding/json"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"os"
 
@@ -12,25 +11,26 @@ import (
 	"github.com/Stalis/go-react-app/server/handlers/account"
 	"github.com/Stalis/go-react-app/server/middlewares"
 	"github.com/gorilla/mux"
+	"github.com/phuslu/log"
 )
 
-func CreateNew(conf *config.Config, l *log.Logger) http.Handler {
+func CreateNew(conf *config.Config) http.Handler {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
-	RouteApi(apiRouter, conf, l)
+	RouteApi(apiRouter, conf)
 
-	RouteFrontend(conf.Frontend, router, l)
-	middlewares.Apply(router, l)
+	RouteFrontend(conf.Frontend, router)
+	middlewares.Apply(router)
 
 	return router
 }
 
-func RouteFrontend(conf config.FrontendConfig, router *mux.Router, l *log.Logger) {
+func RouteFrontend(conf config.FrontendConfig, router *mux.Router) {
 	files, err := ioutil.ReadDir(conf.PathToDist)
 	if err != nil {
-		l.Println(err)
+		log.Error().Err(err).Msg("")
 	}
 
 	fileServer := http.FileServer(http.Dir(conf.PathToDist))
@@ -45,7 +45,7 @@ func RouteFrontend(conf config.FrontendConfig, router *mux.Router, l *log.Logger
 			prefix += "/"
 		}
 
-		l.Printf("Static route for %s\n", prefix)
+		log.Debug().Msgf("Static route for %s", prefix)
 		router.PathPrefix(prefix).Handler(http.StripPrefix("/", fileServer))
 	}
 
@@ -54,15 +54,15 @@ func RouteFrontend(conf config.FrontendConfig, router *mux.Router, l *log.Logger
 	})
 }
 
-func RouteApi(r *mux.Router, cfg *config.Config, l *log.Logger) {
+func RouteApi(r *mux.Router, cfg *config.Config) {
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		// an example API handler
 		json.NewEncoder(w).Encode(map[string]bool{"ok": true})
 	})
 
-	db, err := dal.ConnectDB(cfg.Database.Url, l)
+	db, err := dal.ConnectDB(cfg.Database.Url)
 	if err != nil {
-		l.Println(err.Error())
+		log.Fatal().Err(err).Msg("Can't connect to DB")
 		os.Exit(-1)
 	}
 

@@ -2,19 +2,19 @@ package dal
 
 import (
 	"context"
-	"log"
 
 	"github.com/jackc/pgtype"
 	pgtypeuuid "github.com/jackc/pgtype/ext/gofrs-uuid"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/phuslu/log"
 )
 
 type DB struct {
 	pool *pgxpool.Pool
 }
 
-func ConnectDB(connectionUri string, l *log.Logger) (*DB, error) {
+func ConnectDB(connectionUri string) (*DB, error) {
 	dbconfig, err := pgxpool.ParseConfig(connectionUri)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func ConnectDB(connectionUri string, l *log.Logger) (*DB, error) {
 	if err != nil {
 		return nil, err
 	}
-	l.Printf("%d migration applied", migrationsNum)
+	log.Debug().Msgf("%d migration applied", migrationsNum)
 
 	return &DB{pool}, nil
 }

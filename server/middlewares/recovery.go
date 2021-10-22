@@ -2,12 +2,12 @@ package middlewares
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
+
+	"github.com/phuslu/log"
 )
 
 type recovery struct {
-	l *log.Logger
 }
 
 func (m *recovery) Middleware(next http.Handler) http.Handler {
@@ -15,7 +15,7 @@ func (m *recovery) Middleware(next http.Handler) http.Handler {
 		defer func() {
 			err := recover()
 			if err != nil {
-				m.l.Printf("Panic recover: %v\n", err)
+				log.Error().Interface("panic", err).Msgf("Panic recover")
 
 				jsonBody, _ := json.Marshal(map[string]string{
 					"error": "There was an internal server error",
