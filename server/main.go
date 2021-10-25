@@ -7,9 +7,9 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/Stalis/go-react-app/server/config"
-	"github.com/Stalis/go-react-app/server/router"
-	"github.com/Stalis/go-react-app/server/util/logger"
+	"go-react-app/server/config"
+	"go-react-app/server/router"
+	"go-react-app/server/util/logger"
 )
 
 func main() {

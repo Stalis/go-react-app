@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/Stalis/go-react-app/server/dal"
+	"go-react-app/server/dal"
 )
 
 type RegisterRequest struct {

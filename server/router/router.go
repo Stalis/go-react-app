@@ -6,11 +6,12 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/Stalis/go-react-app/server/config"
-	"github.com/Stalis/go-react-app/server/dal"
-	"github.com/Stalis/go-react-app/server/handlers/account"
-	"github.com/Stalis/go-react-app/server/middlewares"
-	"github.com/Stalis/go-react-app/server/util/logger"
+	"go-react-app/server/config"
+	"go-react-app/server/dal"
+	"go-react-app/server/handlers/account"
+	"go-react-app/server/middlewares"
+	"go-react-app/server/util/logger"
+
 	"github.com/gorilla/mux"
 	"github.com/phuslu/log"
 )

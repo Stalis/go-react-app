@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/Stalis/go-react-app/server/util/logger"
+	"go-react-app/server/util/logger"
 )
 
 type logging struct {

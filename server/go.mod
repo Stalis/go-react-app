@@ -1,4 +1,4 @@
-module github.com/Stalis/go-react-app/server
+module go-react-app/server
 
 go 1.17
 
@@ -29,6 +29,6 @@ require (
 )
 
 require (
-	github.com/phuslu/log v1.0.75 // indirect
-	github.com/rs/zerolog v1.25.0 // indirect
+	github.com/phuslu/log v1.0.75
+	github.com/rs/zerolog v1.25.0
 )

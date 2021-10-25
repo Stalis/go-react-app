@@ -1,8 +1,9 @@
 package middlewares
 
 import (
-	"github.com/Stalis/go-react-app/server/middlewares/requestlog"
-	"github.com/Stalis/go-react-app/server/util/logger"
+	"go-react-app/server/middlewares/requestlog"
+	"go-react-app/server/util/logger"
+
 	"github.com/gorilla/mux"
 )
 

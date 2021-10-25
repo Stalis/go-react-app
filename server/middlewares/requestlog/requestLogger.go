@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/Stalis/go-react-app/server/util/logger"
+	"go-react-app/server/util/logger"
 )
 
 type RequestLogger struct {
