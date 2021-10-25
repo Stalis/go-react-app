@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"os"
 
+	"go-react-app/server/app"
 	"go-react-app/server/config"
 	"go-react-app/server/dal"
 	"go-react-app/server/handlers/account"
@@ -16,15 +16,15 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func New(conf *config.Config, log *logger.Logger) http.Handler {
+func New(a *app.App) http.Handler {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
-	RouteApi(apiRouter, conf, log)
+	RouteApi(apiRouter, a.Config, a.Logger, a.DbContext)
 
-	RouteFrontend(conf.Frontend, router, log)
-	middlewares.Apply(router, log)
+	RouteFrontend(a.Config.Frontend, router, a.Logger)
+	middlewares.Apply(router, a.Logger)
 
 	return router
 }
@@ -32,7 +32,7 @@ func New(conf *config.Config, log *logger.Logger) http.Handler {
 func RouteFrontend(conf config.FrontendConfig, router *mux.Router, log *logger.Logger) {
 	files, err := ioutil.ReadDir(conf.PathToDist)
 	if err != nil {
-		log.Error().Err(err).Msg("")
+		log.Error().Stack().Err(err).Msg("")
 	}
 
 	fileServer := http.FileServer(http.Dir(conf.PathToDist))
@@ -56,17 +56,11 @@ func RouteFrontend(conf config.FrontendConfig, router *mux.Router, log *logger.L
 	})
 }
 
-func RouteApi(r *mux.Router, cfg *config.Config, log *logger.Logger) {
+func RouteApi(r *mux.Router, cfg *config.Config, log *logger.Logger, db *dal.DB) {
 	r.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		// an example API handler
 		json.NewEncoder(w).Encode(map[string]bool{"ok": true})
 	})
-
-	db, err := dal.ConnectDB(log, &cfg.Database)
-	if err != nil {
-		log.Fatal().Err(err).Msg("Can't connect to DB")
-		os.Exit(-1)
-	}
 
 	accountRouter := r.PathPrefix("/account").Subrouter()
 	accountRouter.Handle("/login", account.NewLogin(log, db, db))

@@ -9,6 +9,13 @@ import (
 	pgtypeuuid "github.com/jackc/pgtype/ext/gofrs-uuid"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
+	"github.com/pkg/errors"
+)
+
+const (
+	errParsingConnectionUrl = "error while parsing connection URL"
+	errDbConnection         = "error while connection to database"
+	errApplyMigrations      = "error while applying migrations"
 )
 
 type DB struct {
@@ -18,7 +25,7 @@ type DB struct {
 func ConnectDB(log *logger.Logger, conf *config.DatabaseConfig) (*DB, error) {
 	dbconfig, err := pgxpool.ParseConfig(conf.Url)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, errParsingConnectionUrl)
 	}
 
 	dbconfig.AfterConnect = func(ctx context.Context, conn *pgx.Conn) error {
@@ -32,12 +39,12 @@ func ConnectDB(log *logger.Logger, conf *config.DatabaseConfig) (*DB, error) {
 
 	pool, err := pgxpool.ConnectConfig(context.Background(), dbconfig)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, errDbConnection)
 	}
 
 	migrationsNum, err := applyMigrations(pool)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, errApplyMigrations)
 	}
 	log.Debug().Msgf("%d migration applied", migrationsNum)
 
@@ -46,4 +53,8 @@ func ConnectDB(log *logger.Logger, conf *config.DatabaseConfig) (*DB, error) {
 
 func (db *DB) Close() {
 	db.pool.Close()
+}
+
+func (db *DB) Ping(ctx context.Context) error {
+	return db.pool.Ping(ctx)
 }

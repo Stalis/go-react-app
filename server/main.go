@@ -7,13 +7,34 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/pkg/errors"
+
+	"go-react-app/server/app"
+	"go-react-app/server/app/router"
 	"go-react-app/server/config"
-	"go-react-app/server/router"
+	"go-react-app/server/dal"
 	"go-react-app/server/util/logger"
+
+	"github.com/rs/zerolog/log"
 )
 
 func main() {
+	logger.Configure()
+
+	myErr := foo()
+	log.Error().Stack().Err(myErr).Msg("")
 	conf := config.New()
+	logger := logger.New(conf.Common.IsDebug)
+
+	db, err := dal.ConnectDB(logger, &conf.Database)
+	if err != nil {
+		logger.Fatal().Stack().Err(err).Msg("")
+		return
+	}
+	defer db.Close()
+
+	application := app.New(logger, conf, db)
+	appRouter := router.New(application)
 
 	if conf.Common.IsDebug {
 		fmt.Println("================================================================")
@@ -21,16 +42,13 @@ func main() {
 		fmt.Println("================================================================")
 	}
 
-	logger := logger.New(conf.Common.IsDebug)
-	r := router.New(conf, logger)
-
 	srv := &http.Server{
 		Addr: fmt.Sprintf("%s:%d", conf.HttpServer.Host, conf.HttpServer.Port),
 
 		WriteTimeout: conf.HttpServer.WriteTimeout,
 		ReadTimeout:  conf.HttpServer.ReadTimeout,
 		IdleTimeout:  conf.HttpServer.IdleTimeout,
-		Handler:      r,
+		Handler:      appRouter,
 	}
 
 	// запускаем сервер в горутине, чтобы не блокировать его
@@ -64,4 +82,22 @@ func main() {
 
 	logger.Debug().Msg("shutting down")
 	os.Exit(0)
+}
+
+func foo() error {
+	err := bar()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func bar() error {
+	err := func() error {
+		return errors.New("test error")
+	}()
+	if err != nil {
+		return err
+	}
+	return nil
 }

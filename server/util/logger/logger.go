@@ -10,10 +10,16 @@ import (
 	"os"
 
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/pkgerrors"
 )
 
 type Logger struct {
 	logger *zerolog.Logger
+}
+
+func Configure() {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 }
 
 func New(isDebug bool) *Logger {
@@ -33,6 +39,7 @@ func NewConsole(isDebug bool) *Logger {
 	}
 	zerolog.SetGlobalLevel(logLevel)
 	logger := zerolog.New(os.Stdout).With().Timestamp().Logger()
+
 	return &Logger{logger: &logger}
 }
 
