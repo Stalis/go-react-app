@@ -5,22 +5,22 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/phuslu/log"
+	"github.com/Stalis/go-react-app/server/util/logger"
 )
 
-type logger struct {
+type logging struct {
+	log *logger.Logger
 }
 
-func (m *logger) Middleware(next http.Handler) http.Handler {
+func (m *logging) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		bodyBytes, _ := ioutil.ReadAll(r.Body)
-		buf := bytes.NewBuffer(bodyBytes)
 
 		r.Body.Close()
 		r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 
-		log.Debug().
-			RawJSONStr("request", buf.String()).
+		m.log.Debug().
+			RawJSON("request", bodyBytes).
 			Str("uri", r.RequestURI).
 			Msg("")
 		next.ServeHTTP(rw, r)

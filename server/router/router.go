@@ -10,11 +10,12 @@ import (
 	"github.com/Stalis/go-react-app/server/dal"
 	"github.com/Stalis/go-react-app/server/handlers/account"
 	"github.com/Stalis/go-react-app/server/middlewares"
+	"github.com/Stalis/go-react-app/server/util/logger"
 	"github.com/gorilla/mux"
 	"github.com/phuslu/log"
 )
 
-func CreateNew(conf *config.Config) http.Handler {
+func New(conf *config.Config, log *logger.Logger) http.Handler {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
 
@@ -22,7 +23,7 @@ func CreateNew(conf *config.Config) http.Handler {
 	RouteApi(apiRouter, conf)
 
 	RouteFrontend(conf.Frontend, router)
-	middlewares.Apply(router)
+	middlewares.Apply(router, log)
 
 	return router
 }

@@ -4,10 +4,11 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/phuslu/log"
+	"github.com/Stalis/go-react-app/server/util/logger"
 )
 
 type recovery struct {
+	log *logger.Logger
 }
 
 func (m *recovery) Middleware(next http.Handler) http.Handler {
@@ -15,7 +16,7 @@ func (m *recovery) Middleware(next http.Handler) http.Handler {
 		defer func() {
 			err := recover()
 			if err != nil {
-				log.Error().Interface("panic", err).Msgf("Panic recover")
+				m.log.Error().Interface("panic", err).Msgf("Panic recover")
 
 				jsonBody, _ := json.Marshal(map[string]string{
 					"error": "There was an internal server error",

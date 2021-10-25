@@ -28,4 +28,7 @@ require (
 	gopkg.in/gorp.v1 v1.7.2 // indirect
 )
 
-require github.com/phuslu/log v1.0.75 // indirect
+require (
+	github.com/phuslu/log v1.0.75 // indirect
+	github.com/rs/zerolog v1.25.0 // indirect
+)
