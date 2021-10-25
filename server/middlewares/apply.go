@@ -1,17 +1,15 @@
 package middlewares
 
 import (
-	"go-react-app/server/middlewares/requestlog"
-	"go-react-app/server/util/logger"
+	"go-react-app/server/app"
 
 	"github.com/gorilla/mux"
 )
 
-func Apply(router *mux.Router, log *logger.Logger) {
-
-	recovery := &recovery{log}
-	router.Use(recovery.Middleware)
-
-	requestlogger := requestlog.New(log)
-	router.Use(requestlogger.Middleware)
+func Apply(router *mux.Router, a *app.App) {
+	router.Use(
+		NewRecovery(a.Logger).Middleware,
+		NewRequestLogger(a.Logger).Middleware,
+		NewAuthentication(a.Logger, a.DbContext).Middleware,
+	)
 }

@@ -11,6 +11,10 @@ type recovery struct {
 	log *logger.Logger
 }
 
+func NewRecovery(log *logger.Logger) Middleware {
+	return &recovery{log}
+}
+
 func (m *recovery) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		defer func() {

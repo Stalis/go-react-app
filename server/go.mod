@@ -28,9 +28,13 @@ require (
 	gopkg.in/gorp.v1 v1.7.2 // indirect
 )
 
-require github.com/rs/zerolog v1.25.0
+require (
+	github.com/justinas/alice v1.2.0
+	github.com/pkg/errors v0.9.1
+	github.com/rs/zerolog v1.25.0
+)
 
 require (
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/rs/xid v1.3.0 // indirect
 	github.com/ziutek/mymysql v1.5.4 // indirect
 )

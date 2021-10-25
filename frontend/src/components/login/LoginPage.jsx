@@ -20,6 +20,10 @@ export function LoginPage() {
         axios.post('/api/account/login', {
                 username,
                 password: packed,
+            }, {
+                headers: {
+                    'X-Session-Token': 'initial',
+                },
             })
             .then(({ data }) => {
                 console.log(data);

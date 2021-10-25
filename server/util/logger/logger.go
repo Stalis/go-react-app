@@ -57,6 +57,9 @@ func createJSONLogger() zerolog.Logger {
 
 // Output duplicates the global logger and sets w as its output.
 func (l *Logger) Output(w io.Writer) zerolog.Logger {
+	if w == nil {
+		return *l.logger
+	}
 	return l.logger.Output(w)
 }
 
