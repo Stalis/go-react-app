@@ -23,17 +23,18 @@ export function RegisterPage() {
             String.fromCharCode.apply(null, new Uint8Array(hash))
         )
 
-        let { data } = await axios.post('/api/account/register', {
+        axios.post('/api/account/register', {
                 username,
                 password: packed,
+            })
+            .then(({ data }) => {
+                console.log(data);
+                alert('Register successful!');
+            })
+            .catch(({ response }) => {
+                console.log(response);
+                alert('Not registered!');
             });
-
-        console.log(data);
-        if (data.success) {
-            alert('Register successful!')
-        } else {
-            alert('Not registered!');
-        }
     };
 
     return (

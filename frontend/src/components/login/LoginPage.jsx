@@ -17,17 +17,18 @@ export function LoginPage() {
             String.fromCharCode.apply(null, new Uint8Array(hash))
         )
 
-        const { data } = await axios.post('/api/account/login', {
+        axios.post('/api/account/login', {
                 username,
                 password: packed,
+            })
+            .then(({ data }) => {
+                console.log(data);
+                alert('Login successful!');
+            })
+            .catch(({ response }) => {
+                console.log(response);
+                alert('Login error!');
             });
-
-        console.log(data);
-        if (data.success) {
-            alert('Login successful!');
-        } else {
-            alert('Login error!');
-        }
     };
 
     return (
