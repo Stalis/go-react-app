@@ -18,7 +18,7 @@ import (
 
 func main() {
 	conf := config.New()
-	logger := logger.New(conf.Common.IsDebug)
+	logger := logger.New(conf.Common.IsDebug, &conf.Log)
 
 	db, err := dal.ConnectDB(logger, &conf.Database)
 	if err != nil {

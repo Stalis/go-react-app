@@ -12,50 +12,47 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
+
+	"go-react-app/server/config"
 )
-
-func configure() {
-	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
-	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
-}
-
-func setLoggerDefault(logger *zerolog.Logger) {
-	stdlog.SetFlags(0)
-	stdlog.SetOutput(logger)
-}
 
 type Logger struct {
 	logger *zerolog.Logger
 }
 
-func New(isDebug bool) *Logger {
-	configure()
+func New(isDebug bool, conf *config.LogConfig) *Logger {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 
-	logLevel := zerolog.InfoLevel
-	if isDebug {
-		logLevel = zerolog.DebugLevel
+	logLevel, err := zerolog.ParseLevel(conf.Level)
+	if err != nil {
+		logLevel = zerolog.InfoLevel
+		if isDebug {
+			logLevel = zerolog.DebugLevel
+		}
 	}
-	zerolog.SetGlobalLevel(logLevel)
-	logger := zerolog.New(os.Stderr).With().Timestamp().Logger()
 
-	setLoggerDefault(&logger)
+	zerolog.SetGlobalLevel(logLevel)
+
+	var logger zerolog.Logger
+	if isDebug {
+		logger = createConsoleLogger()
+	} else {
+		logger = createJSONLogger()
+	}
+
+	stdlog.SetFlags(0)
+	stdlog.SetOutput(logger)
 
 	return &Logger{logger: &logger}
 }
 
-func NewConsole(isDebug bool) *Logger {
-	configure()
+func createConsoleLogger() zerolog.Logger {
+	return zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()
+}
 
-	logLevel := zerolog.InfoLevel
-	if isDebug {
-		logLevel = zerolog.DebugLevel
-	}
-	zerolog.SetGlobalLevel(logLevel)
-	logger := zerolog.New(os.Stdout).With().Timestamp().Logger()
-
-	setLoggerDefault(&logger)
-
-	return &Logger{logger: &logger}
+func createJSONLogger() zerolog.Logger {
+	return zerolog.New(os.Stderr).With().Timestamp().Logger()
 }
 
 // Output duplicates the global logger and sets w as its output.
