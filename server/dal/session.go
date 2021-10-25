@@ -15,6 +15,11 @@ type Session struct {
 	ExpiredDate time.Time
 }
 
+type SessionRepository interface {
+	CreateSession(int64) (uuid.UUID, error)
+	GetSessionByToken(uuid.UUID) (*Session, error)
+}
+
 func (db *DB) CreateSession(userId int64) (uuid.UUID, error) {
 	conn, err := db.pool.Acquire(context.Background())
 	if err != nil {

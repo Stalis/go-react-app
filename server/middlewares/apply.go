@@ -12,9 +12,6 @@ func Apply(router *mux.Router, log *logger.Logger) {
 	recovery := &recovery{log}
 	router.Use(recovery.Middleware)
 
-	logging := &logging{log}
-	router.Use(logging.Middleware)
-
 	requestlogger := requestlog.New(log)
 	router.Use(requestlogger.Middleware)
 }

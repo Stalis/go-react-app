@@ -29,6 +29,5 @@ require (
 )
 
 require (
-	github.com/phuslu/log v1.0.75
 	github.com/rs/zerolog v1.25.0
 )

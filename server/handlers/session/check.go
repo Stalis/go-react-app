@@ -1,4 +1,4 @@
-package account
+package session
 
 import (
 	"encoding/json"
@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"go-react-app/server/dal"
+	"go-react-app/server/util/logger"
 
 	"github.com/gofrs/uuid"
 )
@@ -20,23 +21,27 @@ type CheckSessionResponse struct {
 }
 
 type checkSession struct {
-	db *dal.DB
+	log      *logger.Logger
+	sessions dal.SessionRepository
 }
 
-func NewCheckSession(db *dal.DB) http.Handler {
-	return &checkSession{db}
+func NewCheck(log *logger.Logger, sessions dal.SessionRepository) http.Handler {
+	return &checkSession{log, sessions}
 }
 
 func (h *checkSession) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	var request CheckSessionRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		h.log.Error().Stack().Err(err).Msg("")
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	session, err := h.db.GetSessionByToken(request.Token)
+	session, err := h.sessions.GetSessionByToken(request.Token)
 	if err != nil {
+		h.log.Error().Stack().Err(err).Msg("")
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	response := CheckSessionResponse{

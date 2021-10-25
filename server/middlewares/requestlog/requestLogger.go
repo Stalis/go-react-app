@@ -1,6 +1,7 @@
 package requestlog
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"net"
@@ -37,6 +38,14 @@ func (l *RequestLogger) Middleware(next http.Handler) http.Handler {
 		}
 		r2 := new(http.Request)
 		*r2 = *r
+
+		// read request body
+		bodyBytes, _ := ioutil.ReadAll(r.Body)
+
+		r.Body.Close()
+		// return new io.ReadCloser to Body
+		r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
+
 		rcc := &readCounterCloser{r: r.Body}
 		r2.Body = rcc
 		w2 := &responseStats{w: w}
@@ -69,6 +78,7 @@ func (l *RequestLogger) Middleware(next http.Handler) http.Handler {
 				Int64("resp_header_size", le.ResponseHeaderSize).
 				Int64("resp_body_size", le.ResponseBodySize).
 				Dur("latency", le.Latency).
+				RawJSON("request", bodyBytes).
 				Msg("")
 		}()
 

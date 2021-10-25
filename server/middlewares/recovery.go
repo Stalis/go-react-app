@@ -22,8 +22,8 @@ func (m *recovery) Middleware(next http.Handler) http.Handler {
 					"error": "There was an internal server error",
 				})
 
-				rw.Header().Set("Content-Type", "application/json")
 				rw.WriteHeader(http.StatusInternalServerError)
+				rw.Header().Set("Content-Type", "application/json")
 				rw.Write(jsonBody)
 			}
 		}()

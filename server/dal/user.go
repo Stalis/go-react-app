@@ -12,6 +12,12 @@ type User struct {
 	CreatedDate  time.Time
 }
 
+type UserRepository interface {
+	CreateUser(*User) (int64, error)
+	GetUserById(int64) (*User, error)
+	GetUserByUsername(string) (*User, error)
+}
+
 func (db *DB) CreateUser(user *User) (int64, error) {
 	conn, err := db.pool.Acquire(context.Background())
 	if err != nil {

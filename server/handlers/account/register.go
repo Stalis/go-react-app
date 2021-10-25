@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"go-react-app/server/dal"
+	"go-react-app/server/util/logger"
 )
 
 type RegisterRequest struct {
@@ -12,21 +13,19 @@ type RegisterRequest struct {
 	PasswordHash string `json:"password"`
 }
 
-type RegisterResponse struct {
-	Success bool `json:"success"`
-}
-
 type register struct {
-	db *dal.DB
+	log   *logger.Logger
+	users dal.UserRepository
 }
 
-func NewRegister(db *dal.DB) http.Handler {
-	return &register{db}
+func NewRegister(log *logger.Logger, users dal.UserRepository) http.Handler {
+	return &register{log, users}
 }
 
 func (h *register) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	var request RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		h.log.Error().Stack().Err(err).Msg("")
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -36,14 +35,10 @@ func (h *register) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 		PasswordHash: request.PasswordHash,
 	}
 
-	_, err := h.db.CreateUser(&entity)
+	_, err := h.users.CreateUser(&entity)
 	if err != nil {
+		h.log.Error().Stack().Err(err).Msg("")
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	payload, _ := json.Marshal(RegisterResponse{Success: true})
-
-	rw.Header().Set("Content-Type", "application/json")
-	rw.Write(payload)
 }

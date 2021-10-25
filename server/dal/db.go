@@ -2,20 +2,21 @@ package dal
 
 import (
 	"context"
+	"go-react-app/server/config"
+	"go-react-app/server/util/logger"
 
 	"github.com/jackc/pgtype"
 	pgtypeuuid "github.com/jackc/pgtype/ext/gofrs-uuid"
 	"github.com/jackc/pgx/v4"
 	"github.com/jackc/pgx/v4/pgxpool"
-	"github.com/phuslu/log"
 )
 
 type DB struct {
 	pool *pgxpool.Pool
 }
 
-func ConnectDB(connectionUri string) (*DB, error) {
-	dbconfig, err := pgxpool.ParseConfig(connectionUri)
+func ConnectDB(log *logger.Logger, conf *config.DatabaseConfig) (*DB, error) {
+	dbconfig, err := pgxpool.ParseConfig(conf.Url)
 	if err != nil {
 		return nil, err
 	}
