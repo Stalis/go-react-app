@@ -38,6 +38,8 @@ func (r *requestlogger) Middleware(next http.Handler) http.Handler {
 	return c.Then(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		hlog.FromRequest(r).Info().
 			Msg("")
+
+		next.ServeHTTP(rw, r)
 	}))
 
 }

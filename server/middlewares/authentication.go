@@ -44,7 +44,6 @@ func (auth *authentication) Middleware(next http.Handler) http.Handler {
 			return
 		}
 
-		auth.log.Debug().Msgf("Authenticated user")
 		next.ServeHTTP(rw, r)
 	})
 }
