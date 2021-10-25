@@ -17,8 +17,6 @@ import (
 )
 
 func main() {
-	logger.Configure()
-
 	conf := config.New()
 	logger := logger.New(conf.Common.IsDebug)
 

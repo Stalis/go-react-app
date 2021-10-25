@@ -7,38 +7,53 @@ Copy paste from https://github.com/learning-cloud-native-go/myapp/blob/step-6/ut
 import (
 	"context"
 	"io"
+	stdlog "log"
 	"os"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
 )
 
-type Logger struct {
-	logger *zerolog.Logger
-}
-
-func Configure() {
+func configure() {
 	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
 	zerolog.ErrorStackMarshaler = pkgerrors.MarshalStack
 }
 
+func setLoggerDefault(logger *zerolog.Logger) {
+	stdlog.SetFlags(0)
+	stdlog.SetOutput(logger)
+}
+
+type Logger struct {
+	logger *zerolog.Logger
+}
+
 func New(isDebug bool) *Logger {
+	configure()
+
 	logLevel := zerolog.InfoLevel
 	if isDebug {
 		logLevel = zerolog.DebugLevel
 	}
 	zerolog.SetGlobalLevel(logLevel)
 	logger := zerolog.New(os.Stderr).With().Timestamp().Logger()
+
+	setLoggerDefault(&logger)
+
 	return &Logger{logger: &logger}
 }
 
 func NewConsole(isDebug bool) *Logger {
+	configure()
+
 	logLevel := zerolog.InfoLevel
 	if isDebug {
 		logLevel = zerolog.DebugLevel
 	}
 	zerolog.SetGlobalLevel(logLevel)
 	logger := zerolog.New(os.Stdout).With().Timestamp().Logger()
+
+	setLoggerDefault(&logger)
 
 	return &Logger{logger: &logger}
 }
