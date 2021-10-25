@@ -14,15 +14,11 @@ import (
 	"go-react-app/server/config"
 	"go-react-app/server/dal"
 	"go-react-app/server/util/logger"
-
-	"github.com/rs/zerolog/log"
 )
 
 func main() {
 	logger.Configure()
 
-	myErr := foo()
-	log.Error().Stack().Err(myErr).Msg("")
 	conf := config.New()
 	logger := logger.New(conf.Common.IsDebug)
 
