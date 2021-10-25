@@ -25,7 +25,7 @@ func NewRegister(log *logger.Logger, users dal.UserRepository) http.Handler {
 func (h *register) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	var request RegisterRequest
 	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
-		h.log.Error().Stack().Err(err).Msg("")
+		h.log.Error().Stack().Caller().Err(err).Msg("")
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -37,7 +37,7 @@ func (h *register) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	_, err := h.users.CreateUser(&entity)
 	if err != nil {
-		h.log.Error().Stack().Err(err).Msg("")
+		h.log.Error().Stack().Caller().Err(err).Msg("")
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}

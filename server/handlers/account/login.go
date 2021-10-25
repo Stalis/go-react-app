@@ -42,28 +42,28 @@ func NewLogin(log *logger.Logger, users dal.UserRepository, sessions dal.Session
 func (h *login) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 	var request LoginRequest
 	if err := request.FromJSON(r.Body); err != nil {
-		h.log.Error().Stack().Err(err).Msg("Bad request")
+		h.log.Error().Stack().Caller().Err(err).Msg("Bad request")
 		http.Error(rw, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	user, err := h.users.GetUserByUsername(request.Username)
 	if err != nil {
-		h.log.Error().Stack().Err(err).Interface("request", request).Msg("Can't find user")
+		h.log.Error().Stack().Caller().Err(err).Interface("request", request).Msg("Can't find user")
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if user.PasswordHash != request.PasswordHash {
 		err = errors.New("incorrect password")
-		h.log.Error().Stack().Err(err).Msg("")
+		h.log.Error().Stack().Caller().Err(err).Msg("")
 		http.Error(rw, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	token, err := h.sessions.CreateSession(user.Id)
 	if err != nil {
-		h.log.Error().Stack().Err(err).Msg("")
+		h.log.Error().Stack().Caller().Err(err).Msg("")
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
