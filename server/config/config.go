@@ -13,7 +13,7 @@ type CommonConfig struct {
 }
 
 type LogConfig struct {
-	Level       string `env:"LOG_LEVEL" envDefault:"info"`
+	Level       string `env:"LOG_LEVEL" envDefault:"debug"`
 	MaxFileSize int    `env:"LOG_FILESIZE" envDefault:"1073741824"`
 	MaxBackups  int    `env:"LOG_BACKUPS" envDefault:"5"`
 }

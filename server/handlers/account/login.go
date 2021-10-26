@@ -56,14 +56,14 @@ func (h *login) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
 
 	if user.PasswordHash != request.PasswordHash {
 		err = errors.New("incorrect password")
-		h.log.Error().Stack().Caller().Err(err).Msg("")
+		h.log.Error().Stack().Caller().Err(err).Interface("request", request).Msg("")
 		http.Error(rw, err.Error(), http.StatusUnauthorized)
 		return
 	}
 
 	token, err := h.sessions.CreateSession(user.Id)
 	if err != nil {
-		h.log.Error().Stack().Caller().Err(err).Msg("")
+		h.log.Error().Stack().Caller().Err(err).Interface("request", request).Msg("")
 		http.Error(rw, err.Error(), http.StatusInternalServerError)
 		return
 	}
