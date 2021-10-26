@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/georgysavva/scany/pgxscan"
 	"github.com/gofrs/uuid"
 	"github.com/pkg/errors"
 )
@@ -14,11 +15,11 @@ const (
 )
 
 type Session struct {
-	Id          int64
-	Token       uuid.UUID
-	UserId      int64
-	CreatedDate time.Time
-	ExpiredDate time.Time
+	Id          int64     `db:"id"`
+	Token       uuid.UUID `db:"token"`
+	UserId      int64     `db:"user_id"`
+	CreatedDate time.Time `db:"created_date"`
+	ExpiredDate time.Time `db:"expired_date"`
 }
 
 type SessionRepository interface {
@@ -33,12 +34,11 @@ func (db *DB) CreateSession(userId int64) (uuid.UUID, error) {
 	}
 	defer conn.Release()
 
-	row := conn.QueryRow(context.Background(),
+	var sessionToken uuid.UUID
+	err = pgxscan.Get(context.Background(), conn, &sessionToken,
 		`INSERT INTO sessions(user_id) VALUES ($1) RETURNING token`,
 		userId)
-
-	var sessionToken uuid.UUID
-	if err = row.Scan(&sessionToken); err != nil {
+	if err != nil {
 		return uuid.Nil, errors.Wrap(err, errSessionInserting)
 	}
 
@@ -52,12 +52,12 @@ func (db *DB) GetSessionByToken(token uuid.UUID) (*Session, error) {
 	}
 	defer conn.Release()
 
-	row := conn.QueryRow(context.Background(),
+	var res Session
+	err = pgxscan.Get(context.Background(), conn, &res,
 		`SELECT id, token, user_id, created_date, expired_date FROM users WHERE token = $1`,
 		token)
-	var res Session
-	if err = row.Scan(&res.Id, &res.Token, &res.UserId, &res.CreatedDate, &res.ExpiredDate); err != nil {
-		return nil, errors.Wrap(err, errSessionReading)
+	if err != nil {
+		errors.Wrap(err, errSessionReading)
 	}
 
 	return &res, nil

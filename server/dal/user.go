@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/georgysavva/scany/pgxscan"
 	"github.com/pkg/errors"
 )
 
@@ -14,10 +15,10 @@ const (
 )
 
 type User struct {
-	Id           int64
-	Username     string
-	PasswordHash string
-	CreatedDate  time.Time
+	Id           int64     `db:"id"`
+	Username     string    `db:"username"`
+	PasswordHash string    `db:"password_hash"`
+	CreatedDate  time.Time `db:"created_date"`
 }
 
 type UserRepository interface {
@@ -33,12 +34,11 @@ func (db *DB) CreateUser(user *User) (int64, error) {
 	}
 	defer conn.Release()
 
-	row := conn.QueryRow(context.Background(),
+	var userId int64
+	err = pgxscan.Get(context.Background(), conn, &userId,
 		`INSERT INTO users(username, password_hash) VALUES ($1, $2) RETURNING id`,
 		user.Username, user.PasswordHash)
-
-	var userId int64
-	if err = row.Scan(&userId); err != nil {
+	if err != nil {
 		return -1, errors.Wrap(err, errUserInserting)
 	}
 
@@ -52,12 +52,11 @@ func (db *DB) GetUserById(id int64) (*User, error) {
 	}
 	defer conn.Release()
 
-	row := conn.QueryRow(context.Background(),
+	var res User
+	err = pgxscan.Get(context.Background(), conn, &res,
 		`SELECT id, username, password_hash, created_date FROM users WHERE id = $1`,
 		id)
-
-	var res User
-	if err = row.Scan(&res.Id, &res.Username, &res.PasswordHash, &res.CreatedDate); err != nil {
+	if err != nil {
 		return nil, errors.Wrap(err, errUserReading)
 	}
 
@@ -71,12 +70,11 @@ func (db *DB) GetUserByUsername(username string) (*User, error) {
 	}
 	defer conn.Release()
 
-	row := conn.QueryRow(context.Background(),
+	var res User
+	err = pgxscan.Get(context.Background(), conn, &res,
 		`SELECT id, username, password_hash, created_date FROM users WHERE username = $1`,
 		username)
-
-	var res User
-	if err = row.Scan(&res.Id, &res.Username, &res.PasswordHash, &res.CreatedDate); err != nil {
+	if err != nil {
 		return nil, errors.Wrap(err, errUserReading)
 	}
 
