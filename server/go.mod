@@ -29,6 +29,8 @@ require (
 )
 
 require (
+	github.com/georgysavva/scany v0.2.9
+	github.com/gorilla/sessions v1.2.1
 	github.com/justinas/alice v1.2.0
 	github.com/pkg/errors v0.9.1
 	github.com/rs/zerolog v1.25.0
@@ -36,9 +38,7 @@ require (
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
-	github.com/georgysavva/scany v0.2.9 // indirect
 	github.com/gorilla/securecookie v1.1.1 // indirect
-	github.com/gorilla/sessions v1.2.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rs/xid v1.3.0 // indirect
 	github.com/stretchr/objx v0.2.0 // indirect
