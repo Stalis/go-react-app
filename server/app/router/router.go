@@ -18,15 +18,12 @@ import (
 func New(a *app.App) http.Handler {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
-	router.Use(middlewares.NewRecovery(a.Logger).Middleware)
-	router.Use(middlewares.NewRequestLogger(a.Logger).Middleware)
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
 	RouteApi(apiRouter, a)
 
 	RouteFrontend(a.Config.Frontend, router, a.Logger)
-
-	//middlewares.Apply(apiRouter, a)
+	middlewares.Apply(router, a)
 
 	return router
 }
@@ -70,8 +67,4 @@ func RouteApi(r *mux.Router, a *app.App) {
 
 	sessionRouter := r.PathPrefix("/session").Subrouter()
 	sessionRouter.Handle("/check", session.NewCheck(a.Logger, a.DbContext))
-
-	authorizedRouter := r.PathPrefix("/").Subrouter()
-	authorizedRouter.Use(middlewares.NewAuthentication(a.Logger, a.DbContext).Middleware)
-	authorizedRouter.Handle("/hello", http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) { rw.Write([]byte("hello")) }))
 }
