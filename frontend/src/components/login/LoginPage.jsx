@@ -27,6 +27,7 @@ export function LoginPage() {
             })
             .then(({ data }) => {
                 console.log(data);
+                localStorage.setItem("session_token", data.sessionToken);
                 alert('Login successful!');
             })
             .catch(({ response }) => {
