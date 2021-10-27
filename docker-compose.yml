@@ -1,22 +1,6 @@
 version: '3.5'
 
 services:
-  app:
-    container_name: app_container
-    build: 
-      context: .
-      dockerfile: Dockerfile.alpine
-    environment:
-      LOG_LEVEL: info
-      DATABASE_URL: "postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/postgres"
-    ports:
-      - "9080:80"
-    networks:
-      - postgres
-    depends_on:
-      - postgres
-      - redis
-
   postgres:
     container_name: postgres_container
     image: postgres
