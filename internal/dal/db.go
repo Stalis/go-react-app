@@ -2,8 +2,8 @@ package dal
 
 import (
 	"context"
-	"go-react-app/server/config"
-	"go-react-app/server/util/logger"
+	"go-react-app/internal/config"
+	"go-react-app/internal/util/logger"
 
 	"github.com/jackc/pgtype"
 	pgtypeuuid "github.com/jackc/pgtype/ext/gofrs-uuid"

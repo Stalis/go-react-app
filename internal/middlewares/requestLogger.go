@@ -1,7 +1,7 @@
 package middlewares
 
 import (
-	"go-react-app/server/util/logger"
+	"go-react-app/internal/util/logger"
 	"net/http"
 	"time"
 

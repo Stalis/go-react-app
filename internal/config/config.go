@@ -45,13 +45,11 @@ type Config struct {
 	Database   DatabaseConfig
 }
 
-func init() {
-	if err := godotenv.Load(".env"); err != nil {
+func New(dotenvPath string) *Config {
+	if err := godotenv.Load(dotenvPath); err != nil {
 		fmt.Println("No .env file found!")
 	}
-}
 
-func New() *Config {
 	cfg := &Config{}
 	if err := env.Parse(cfg); err != nil {
 		fmt.Printf("%+v\n", err)

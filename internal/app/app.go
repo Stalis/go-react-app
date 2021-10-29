@@ -1,9 +1,9 @@
 package app
 
 import (
-	"go-react-app/server/config"
-	"go-react-app/server/dal"
-	"go-react-app/server/util/logger"
+	"go-react-app/internal/config"
+	"go-react-app/internal/dal"
+	"go-react-app/internal/util/logger"
 )
 
 type App struct {

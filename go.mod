@@ -1,4 +1,4 @@
-module go-react-app/server
+module go-react-app
 
 go 1.17
 

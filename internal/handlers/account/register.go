@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"go-react-app/server/dal"
-	"go-react-app/server/util/logger"
+	"go-react-app/internal/dal"
+	"go-react-app/internal/util/logger"
 )
 
 type RegisterRequest struct {

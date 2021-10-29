@@ -13,7 +13,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/pkgerrors"
 
-	"go-react-app/server/config"
+	"go-react-app/internal/config"
 )
 
 type Logger struct {

@@ -5,12 +5,12 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"go-react-app/server/app"
-	"go-react-app/server/config"
-	"go-react-app/server/handlers/account"
-	"go-react-app/server/handlers/session"
-	"go-react-app/server/middlewares"
-	"go-react-app/server/util/logger"
+	"go-react-app/internal/app"
+	"go-react-app/internal/config"
+	"go-react-app/internal/handlers/account"
+	"go-react-app/internal/handlers/session"
+	"go-react-app/internal/middlewares"
+	"go-react-app/internal/util/logger"
 
 	"github.com/gorilla/mux"
 )

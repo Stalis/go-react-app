@@ -2,7 +2,7 @@ package middlewares
 
 import (
 	"bytes"
-	"go-react-app/server/util/logger"
+	"go-react-app/internal/util/logger"
 	"io"
 	"net/http"
 

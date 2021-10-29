@@ -6,8 +6,8 @@ import (
 	"io"
 	"net/http"
 
-	"go-react-app/server/dal"
-	"go-react-app/server/util/logger"
+	"go-react-app/internal/dal"
+	"go-react-app/internal/util/logger"
 
 	"github.com/gofrs/uuid"
 )
