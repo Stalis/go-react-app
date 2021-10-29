@@ -36,7 +36,8 @@ func (r *requestlogger) Middleware(next http.Handler) http.Handler {
 	c = c.Append(hlog.RequestIDHandler("req_id", "Request-Id"))
 
 	return c.Then(http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
-		hlog.FromRequest(r).Info().
+		hlog.FromRequest(r).
+			Info().
 			Msg("")
 
 		next.ServeHTTP(rw, r)
