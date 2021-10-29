@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -17,7 +18,10 @@ import (
 )
 
 func main() {
-	conf := config.New()
+	configPath := flag.String("config", ".env", "path to '.env' format config file")
+	flag.Parse()
+
+	conf := config.New(configPath)
 	logger := logger.New(conf.Common.IsDebug, &conf.Log)
 
 	db, err := dal.ConnectDB(logger, &conf.Database)
