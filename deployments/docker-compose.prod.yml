@@ -9,12 +9,14 @@ services:
     environment:
       LOG_LEVEL: info
       DATABASE_URL: "postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/postgres"
+      SERVER_PORT: 80
     volumes:
       - app_logs:/app/logs
     ports:
       - "9080:80"
     networks:
       - postgres
+      - redis
     depends_on:
       - postgres
       - redis
