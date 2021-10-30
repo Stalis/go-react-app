@@ -11,6 +11,9 @@ build: get
 run: get
 	go run $(server_main) --config $(config_path)
 
+test: get
+	go test -v ./internal/...
+
 get: mod-tidy
 
 mod-tidy: mod-download
