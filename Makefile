@@ -1,11 +1,15 @@
 docker_tags = v0.0.4
 server_main = cmd/server/main.go
 server_bin = bin/server
+config_path = configs/.env
 
 .PHONY: build docker docker_scratch get
 
 build: get
 	go build -o $(server_bin) $(server_main)
+
+run: get
+	go run $(server_main) --config $(config_path)
 
 get: mod-tidy
 
@@ -20,3 +24,6 @@ docker:
 
 docker_scratch:
 	docker build ./docker/Dockerfile --tag $(docker_tags)
+
+compose:
+	docker compose -f deployments/docker-compose.prod.yml -f deployments/docker-compose.yml up -d
