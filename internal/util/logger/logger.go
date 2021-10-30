@@ -51,27 +51,14 @@ func New(isDebug bool, conf *config.LogConfig) *Logger {
 		log.Fatal().Err(err).Stack().Caller().Msg("")
 	}
 
-	writer := io.MultiWriter(os.Stderr, file)
+	writer := io.MultiWriter(zerolog.ConsoleWriter{Out: os.Stderr}, file)
 
-	var logger zerolog.Logger
-	if isDebug {
-		logger = createConsoleLogger(writer)
-	} else {
-		logger = createJSONLogger(writer)
-	}
+	logger := zerolog.New(writer).With().Timestamp().Logger()
 
 	stdlog.SetFlags(0)
 	stdlog.SetOutput(logger)
 
 	return &Logger{logger: &logger}
-}
-
-func createConsoleLogger(writer io.Writer) zerolog.Logger {
-	return zerolog.New(zerolog.ConsoleWriter{Out: writer}).With().Timestamp().Logger()
-}
-
-func createJSONLogger(writer io.Writer) zerolog.Logger {
-	return zerolog.New(writer).With().Timestamp().Logger()
 }
 
 // Output duplicates the global logger and sets w as its output.

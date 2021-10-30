@@ -3,7 +3,7 @@ server_main = cmd/server/main.go
 server_bin = bin/server
 config_path = configs/.env
 
-.PHONY: build docker docker_scratch get
+.PHONY: build docker docker-scratch get mod-tidy mod-download compose compose-pull
 
 build: get
 	go build -o $(server_bin) $(server_main)
@@ -22,8 +22,8 @@ mod-download:
 docker:
 	docker build ./docker/Dockerfile.alpine --tag $(docker_tags)
 
-docker_scratch:
+docker-scratch:
 	docker build ./docker/Dockerfile --tag $(docker_tags)
 
 compose:
-	docker compose -f deployments/docker-compose.prod.yml -f deployments/docker-compose.yml up -d
+	docker compose -f deployments/docker-compose.prod.yml -f deployments/docker-compose.yml up -d -p go-react-app
