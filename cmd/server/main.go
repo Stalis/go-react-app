@@ -8,8 +8,6 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/pkg/errors"
-
 	"go-react-app/internal/app"
 	"go-react-app/internal/app/router"
 	"go-react-app/internal/config"
@@ -21,7 +19,7 @@ func main() {
 	configPath := flag.String("config", ".env", "path to '.env' format config file")
 	flag.Parse()
 
-	conf := config.New(configPath)
+	conf := config.New(*configPath)
 	logger := logger.New(conf.Common.IsDebug, &conf.Log)
 
 	db, err := dal.ConnectDB(logger, &conf.Database)
@@ -80,22 +78,4 @@ func main() {
 
 	logger.Debug().Msg("shutting down")
 	os.Exit(0)
-}
-
-func foo() error {
-	err := bar()
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func bar() error {
-	err := func() error {
-		return errors.New("test error")
-	}()
-	if err != nil {
-		return err
-	}
-	return nil
 }

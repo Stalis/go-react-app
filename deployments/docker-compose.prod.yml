@@ -1,11 +1,11 @@
-version: '3.5'
+version: '3.9'
 
 services:
   app:
     container_name: app_container
     build: 
-      context: .
-      dockerfile: Dockerfile.alpine
+      context: ../
+      dockerfile: docker/Dockerfile.alpine
     environment:
       LOG_LEVEL: info
       DATABASE_URL: "postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/postgres"
@@ -19,5 +19,5 @@ services:
       - postgres
       - redis
   
-  volumes:
-    app_logs
+volumes:
+  app_logs:
