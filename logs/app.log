@@ -1,0 +1,17 @@
+{"level":"debug","time":1635586733,"message":"0 migration applied"}
+{"level":"debug","time":1635586733,"message":"Static route for /asset-manifest.json"}
+{"level":"debug","time":1635586733,"message":"Static route for /favicon.ico"}
+{"level":"debug","time":1635586733,"message":"Static route for /logo192.png"}
+{"level":"debug","time":1635586733,"message":"Static route for /logo512.png"}
+{"level":"debug","time":1635586733,"message":"Static route for /manifest.json"}
+{"level":"debug","time":1635586733,"message":"Static route for /robots.txt"}
+{"level":"debug","time":1635586733,"message":"Static route for /static/"}
+{"level":"info","time":1635586733,"message":"Server started at: http://localhost:9080"}
+{"level":"debug","httpStatus":"200 OK","time":1635586734,"message":"Test HTTPS Request passed!"}
+{"level":"info","ip":"127.0.0.1:53810","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:93.0) Gecko/20100101 Firefox/93.0","referer":"http://localhost:9080/login","req_id":"c5uh5cdh5s5ssmuvnjf0","time":1635586737}
+{"level":"error","caller":"/Users/stalis/Develop/golang/go-react-app/internal/handlers/account/login.go:59","error":"incorrect password","request":{"username":"asd","password":"qgEjkRDa03OlGbTaV008V89rU1YLIndK1rWAJ+FUTPQ="},"time":1635586737}
+{"level":"info","ip":"127.0.0.1:53810","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:93.0) Gecko/20100101 Firefox/93.0","referer":"http://localhost:9080/login","req_id":"c5uh5cdh5s5ssmuvnjf0","method":"POST","url":"/api/account/login","status":401,"size":19,"duration":14.103118,"time":1635586737}
+{"level":"info","ip":"127.0.0.1:53810","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:93.0) Gecko/20100101 Firefox/93.0","referer":"http://localhost:9080/login","req_id":"c5uh5ddh5s5ssmuvnjfg","time":1635586741}
+{"level":"info","ip":"127.0.0.1:53810","user_agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:93.0) Gecko/20100101 Firefox/93.0","referer":"http://localhost:9080/login","req_id":"c5uh5ddh5s5ssmuvnjfg","method":"POST","url":"/api/account/login","status":200,"size":56,"duration":29.266539,"time":1635586741}
+{"level":"debug","signal":"interrupt","time":1635586744,"message":"Interrupted with signal"}
+{"level":"fatal","error":"http: Server closed","time":1635586744,"message":"listen failed"}

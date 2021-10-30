@@ -9,8 +9,12 @@ import (
 	"io"
 	stdlog "log"
 	"os"
+	"path"
+
+	"github.com/pkg/errors"
 
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/rs/zerolog/pkgerrors"
 
 	"go-react-app/internal/config"
@@ -34,11 +38,26 @@ func New(isDebug bool, conf *config.LogConfig) *Logger {
 
 	zerolog.SetGlobalLevel(logLevel)
 
+	err = os.MkdirAll(conf.FolderPath, os.ModePerm)
+	if err != nil {
+		errors.Wrap(err, "cannot create logs folder")
+		log.Fatal().Err(err).Stack().Caller().Msg("")
+	}
+
+	logFilePath := path.Join(conf.FolderPath, "app.log")
+	file, err := os.OpenFile(logFilePath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+	if err != nil {
+		errors.Wrap(err, "cannot create log file")
+		log.Fatal().Err(err).Stack().Caller().Msg("")
+	}
+
+	writer := io.MultiWriter(os.Stderr, file)
+
 	var logger zerolog.Logger
 	if isDebug {
-		logger = createConsoleLogger()
+		logger = createConsoleLogger(writer)
 	} else {
-		logger = createJSONLogger()
+		logger = createJSONLogger(writer)
 	}
 
 	stdlog.SetFlags(0)
@@ -47,12 +66,12 @@ func New(isDebug bool, conf *config.LogConfig) *Logger {
 	return &Logger{logger: &logger}
 }
 
-func createConsoleLogger() zerolog.Logger {
-	return zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr}).With().Timestamp().Logger()
+func createConsoleLogger(writer io.Writer) zerolog.Logger {
+	return zerolog.New(zerolog.ConsoleWriter{Out: writer}).With().Timestamp().Logger()
 }
 
-func createJSONLogger() zerolog.Logger {
-	return zerolog.New(os.Stderr).With().Timestamp().Logger()
+func createJSONLogger(writer io.Writer) zerolog.Logger {
+	return zerolog.New(writer).With().Timestamp().Logger()
 }
 
 // Output duplicates the global logger and sets w as its output.
