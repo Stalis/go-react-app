@@ -6,16 +6,22 @@ import (
 	"net/http"
 
 	"github.com/gofrs/uuid"
+	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 )
 
-type authentication struct {
-	log      *logger.Logger
-	sessions dal.SessionRepository
+type SessionGetter interface {
+	GetSessionByToken(uuid.UUID) (*dal.Session, error)
 }
 
-func NewAuthentication(log *logger.Logger, sessions dal.SessionRepository) *authentication {
-	return &authentication{log, sessions}
+type authentication struct {
+	log      *logger.Logger
+	sessions SessionGetter
+}
+
+func NewAuthentication(log *logger.Logger, sessions SessionGetter) mux.MiddlewareFunc {
+	v := &authentication{log, sessions}
+	return v.Middleware
 }
 
 func (auth *authentication) CheckToken(token string) error {

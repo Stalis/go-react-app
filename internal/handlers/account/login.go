@@ -29,13 +29,21 @@ func (l *LoginResponse) ToJSON(w io.Writer) error {
 	return json.NewEncoder(w).Encode(l)
 }
 
-type login struct {
-	log      *logger.Logger
-	users    dal.UserRepository
-	sessions dal.SessionRepository
+type UserByUsernameGetter interface {
+	GetUserByUsername(string) (*dal.User, error)
 }
 
-func NewLogin(log *logger.Logger, users dal.UserRepository, sessions dal.SessionRepository) http.Handler {
+type SessionCreator interface {
+	CreateSession(int64) (uuid.UUID, error)
+}
+
+type login struct {
+	log      *logger.Logger
+	users    UserByUsernameGetter
+	sessions SessionCreator
+}
+
+func NewLogin(log *logger.Logger, users UserByUsernameGetter, sessions SessionCreator) http.Handler {
 	return &login{log, users, sessions}
 }
 

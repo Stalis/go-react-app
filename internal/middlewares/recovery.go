@@ -5,22 +5,22 @@ import (
 	"net/http"
 
 	"go-react-app/internal/util/logger"
+
+	"github.com/gorilla/mux"
 )
 
-type recovery struct {
-	log *logger.Logger
+func NewRecovery(log *logger.Logger) mux.MiddlewareFunc {
+	return func(next http.Handler) http.Handler {
+		return recoveryInternal(log, next)
+	}
 }
 
-func NewRecovery(log *logger.Logger) Middleware {
-	return &recovery{log}
-}
-
-func (m *recovery) Middleware(next http.Handler) http.Handler {
+func recoveryInternal(log *logger.Logger, next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		defer func() {
 			err := recover()
 			if err != nil {
-				m.log.Error().Interface("panic", err).Msgf("Panic recover")
+				log.Error().Interface("panic", err).Msgf("Panic recover")
 
 				jsonBody, _ := json.Marshal(map[string]string{
 					"error": "There was an internal server error",

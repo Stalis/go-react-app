@@ -19,10 +19,10 @@ func New(a *app.App) http.Handler {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
 
-	router.Use(middlewares.NewRecovery(a.Logger).Middleware)
-	router.Use(middlewares.NewRequestLogger(a.Logger).Middleware)
+	router.Use(middlewares.NewRecovery(a.Logger))
+	router.Use(middlewares.NewRequestLogger(a.Logger))
 	if a.Config.Common.IsDebug {
-		router.Use(middlewares.NewRequestBodyLogger(a.Logger).Middleware)
+		router.Use(middlewares.NewRequestBodyLogger(a.Logger))
 	}
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
@@ -74,6 +74,6 @@ func RouteApi(r *mux.Router, a *app.App) {
 	sessionRouter.Handle("/check", session.NewCheck(a.Logger, a.DbContext))
 
 	securedRouter := r.PathPrefix("/").Subrouter()
-	securedRouter.Use(middlewares.NewAuthentication(a.Logger, a.DbContext).Middleware)
+	securedRouter.Use(middlewares.NewAuthentication(a.Logger, a.DbContext))
 	securedRouter.Handle("/hello", http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) { rw.Write([]byte("hello")) }))
 }

@@ -20,12 +20,16 @@ type CheckSessionResponse struct {
 	ExpiredTime time.Time
 }
 
-type checkSession struct {
-	log      *logger.Logger
-	sessions dal.SessionRepository
+type SessionGetter interface {
+	GetSessionByToken(uuid.UUID) (*dal.Session, error)
 }
 
-func NewCheck(log *logger.Logger, sessions dal.SessionRepository) http.Handler {
+type checkSession struct {
+	log      *logger.Logger
+	sessions SessionGetter
+}
+
+func NewCheck(log *logger.Logger, sessions SessionGetter) http.Handler {
 	return &checkSession{log, sessions}
 }
 

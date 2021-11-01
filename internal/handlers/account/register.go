@@ -13,12 +13,16 @@ type RegisterRequest struct {
 	PasswordHash string `json:"password"`
 }
 
-type register struct {
-	log   *logger.Logger
-	users dal.UserRepository
+type UserCreator interface {
+	CreateUser(*dal.User) (int64, error)
 }
 
-func NewRegister(log *logger.Logger, users dal.UserRepository) http.Handler {
+type register struct {
+	log   *logger.Logger
+	users UserCreator
+}
+
+func NewRegister(log *logger.Logger, users UserCreator) http.Handler {
 	return &register{log, users}
 }
 
