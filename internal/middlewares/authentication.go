@@ -6,7 +6,6 @@ import (
 	"net/http"
 
 	"github.com/gofrs/uuid"
-	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 )
 
@@ -19,17 +18,12 @@ type authentication struct {
 	sessions SessionGetter
 }
 
-func NewAuthentication(log *logger.Logger, sessions SessionGetter) mux.MiddlewareFunc {
-	v := &authentication{log, sessions}
-	return v.Middleware
+func NewAuthentication(log *logger.Logger, sessions SessionGetter) *authentication {
+	return &authentication{log, sessions}
 }
 
 func (auth *authentication) CheckToken(token string) error {
-	if token == "initial" {
-		auth.log.Debug().Msgf("Initial user")
-		return nil
-	}
-
+	auth.log.Debug().Msgf("auth token: %v", token)
 	session, err := auth.sessions.GetSessionByToken(uuid.FromStringOrNil(token))
 	if err != nil {
 		return err

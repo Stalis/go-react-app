@@ -48,6 +48,7 @@ func NewLogin(log *logger.Logger, users UserByUsernameGetter, sessions SessionCr
 }
 
 func (h *login) ServeHTTP(rw http.ResponseWriter, r *http.Request) {
+	h.log.Debug().Msg("lol")
 	var request LoginRequest
 	if err := request.FromJSON(r.Body); err != nil {
 		h.log.Error().Stack().Caller().Err(err).Msg("Bad request")

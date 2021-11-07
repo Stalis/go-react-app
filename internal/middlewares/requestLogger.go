@@ -5,21 +5,22 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gorilla/mux"
 	"github.com/justinas/alice"
 	"github.com/rs/zerolog/hlog"
 )
 
-func NewRequestLogger(log *logger.Logger) mux.MiddlewareFunc {
-	return func(next http.Handler) http.Handler {
-		return requestLoggerInternal(log, next)
-	}
+type RequestLogger struct {
+	log *logger.Logger
 }
 
-func requestLoggerInternal(log *logger.Logger, next http.Handler) http.Handler {
+func NewRequestLogger(log *logger.Logger) *RequestLogger {
+	return &RequestLogger{log}
+}
+
+func (l *RequestLogger) Middleware(next http.Handler) http.Handler {
 	c := alice.New()
 
-	c = c.Append(hlog.NewHandler(log.Output(nil)))
+	c = c.Append(hlog.NewHandler(l.log.Output(nil)))
 	c = c.Append(hlog.AccessHandler(func(r *http.Request, status, size int, duration time.Duration) {
 		hlog.FromRequest(r).Info().
 			Str("method", r.Method).
@@ -41,5 +42,4 @@ func requestLoggerInternal(log *logger.Logger, next http.Handler) http.Handler {
 
 		next.ServeHTTP(rw, r)
 	}))
-
 }

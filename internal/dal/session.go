@@ -52,7 +52,8 @@ func (db *DB) GetSessionByToken(token uuid.UUID) (*Session, error) {
 		`SELECT id, token, user_id, created_date, expired_date FROM users WHERE token = $1`,
 		token)
 	if err != nil {
-		errors.Wrap(err, errSessionReading)
+		err = errors.Wrap(err, errSessionReading)
+		return nil, err
 	}
 
 	return &res, nil

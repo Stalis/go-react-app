@@ -6,22 +6,23 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/gorilla/mux"
 	"github.com/pkg/errors"
 )
 
-func NewRequestBodyLogger(log *logger.Logger) mux.MiddlewareFunc {
-	return func(next http.Handler) http.Handler {
-		return requestBodyLoggerInternal(log, next)
-	}
+type RequestBodyLogger struct {
+	log *logger.Logger
 }
 
-func requestBodyLoggerInternal(log *logger.Logger, next http.Handler) http.Handler {
+func NewRequestBodyLogger(log *logger.Logger) *RequestBodyLogger {
+	return &RequestBodyLogger{log}
+}
+
+func (m *RequestBodyLogger) Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
 		bodyBytes, err := io.ReadAll(r.Body)
 		if err != nil {
 			err := errors.Wrap(err, "unable to read request body")
-			log.Error().Stack().Caller().Err(err).Msg("")
+			m.log.Error().Stack().Caller().Err(err).Msg("")
 			http.Error(rw, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -29,6 +30,8 @@ func requestBodyLoggerInternal(log *logger.Logger, next http.Handler) http.Handl
 		r.Body.Close()
 		r.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
 
-		log.Debug().RawJSON("request", bodyBytes).Msg("")
+		m.log.Debug().RawJSON("request", bodyBytes).Msg("")
+
+		next.ServeHTTP(rw, r)
 	})
 }

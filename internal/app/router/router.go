@@ -19,10 +19,10 @@ func New(a *app.App) http.Handler {
 	router := mux.NewRouter()
 	router.StrictSlash(true)
 
-	router.Use(middlewares.NewRecovery(a.Logger))
-	router.Use(middlewares.NewRequestLogger(a.Logger))
+	router.Use(middlewares.NewRecovery(a.Logger).Middleware)
+	router.Use(middlewares.NewRequestLogger(a.Logger).Middleware)
 	if a.Config.Common.IsDebug {
-		router.Use(middlewares.NewRequestBodyLogger(a.Logger))
+		router.Use(middlewares.NewRequestBodyLogger(a.Logger).Middleware)
 	}
 
 	apiRouter := router.PathPrefix("/api").Subrouter()
@@ -67,13 +67,20 @@ func RouteApi(r *mux.Router, a *app.App) {
 	})
 
 	accountRouter := r.PathPrefix("/account").Subrouter()
-	accountRouter.Handle("/login", account.NewLogin(a.Logger, a.DbContext, a.DbContext))
-	accountRouter.Handle("/register", account.NewRegister(a.Logger, a.DbContext))
+	accountRouter.Handle("/login", account.NewLogin(a.Logger, a.DbContext, a.DbContext)).
+		Methods(http.MethodPost)
+	accountRouter.Handle("/register", account.NewRegister(a.Logger, a.DbContext)).
+		Methods(http.MethodPost)
 
 	sessionRouter := r.PathPrefix("/session").Subrouter()
-	sessionRouter.Handle("/check", session.NewCheck(a.Logger, a.DbContext))
+	sessionRouter.Handle("/check", session.NewCheck(a.Logger, a.DbContext)).
+		Methods(http.MethodPost)
 
 	securedRouter := r.PathPrefix("/").Subrouter()
-	securedRouter.Use(middlewares.NewAuthentication(a.Logger, a.DbContext))
-	securedRouter.Handle("/hello", http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) { rw.Write([]byte("hello")) }))
+	securedRouter.Use(middlewares.NewAuthentication(a.Logger, a.DbContext).Middleware)
+	securedRouter.
+		Handle("/hello", http.HandlerFunc(func(rw http.ResponseWriter, r *http.Request) {
+			rw.Write([]byte("hello"))
+		})).
+		Methods(http.MethodGet)
 }
