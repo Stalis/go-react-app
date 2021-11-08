@@ -1,0 +1,58 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Client Deps Install",
+			"type": "npm",
+			"script": "install",
+			"path": "web/app/",
+			"problemMatcher": [],
+			"detail": "install dependencies from package"
+		},
+		{
+			"label": "Client Build",
+			"dependsOn": [ "Client Deps Install" ],
+			"type": "npm",
+			"script": "build",
+			"path": "web/app/",
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "react-scripts build"
+		},
+		{
+			"label": "Server Deps Download",
+			"type": "shell",
+			"command": [ "go" ],
+			"args": [ "mod", "download", "-x" ],
+		},
+		{
+			"label": "Server Deps Fix",
+			"type": "shell",
+			"command": [ "go" ],
+			"args": [ "mod", "tidy" ]
+		},
+		{
+			"label": "Server Build",
+			"dependsOrder": "sequence",
+			"dependsOn": [ "Server Deps Download", "Server Deps Fix" ],
+			"group": "build",
+			"problemMatcher": "$go",
+			"command": [ "go" ],
+			"args": [ "build", "-o", "bin/server", "-v", "cmd/server/main.go" ],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"windows": {
+				"args": [ "build", "-o", "bin/server.exe", "-v", "cmd/server/main.go" ]
+			}
+		},
+		{
+			"label": "Build",
+			"dependsOn": [ "Client Build", "Server Build" ],
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		}
+	]
+}
